@@ -4,6 +4,10 @@
 
 ---
 
+## Notification
++ This is only implemented the backend yet.
++ It is designed for people who can speak TCP, but once the backend is complete, we will create the frontend.
+
 ## Features
 + `sudo` command for windows.
 + Fast execute \( > 100ms)
@@ -16,3 +20,4 @@
 + Password  protection
 + Run as another user
 + Remote process execute/attach \(Security problem)
++ Tasktray gui
