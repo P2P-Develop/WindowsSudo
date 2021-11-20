@@ -122,6 +122,8 @@ namespace WindowsSudo
         {
             alive = false;
             Send("{\"exit\": true}");
+            client.Close();
+
         }
 
     }

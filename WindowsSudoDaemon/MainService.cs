@@ -47,7 +47,7 @@ namespace WindowsSudo
         public void TestStartupAndStop(string[] args)
         {
             this.OnStart(args);
-            while(true)
+            while(server.alive)
                 Thread.Sleep(100);
         }
     }

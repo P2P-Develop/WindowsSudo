@@ -17,7 +17,7 @@ namespace WindowsSudo
         private readonly TcpListener listener;
         private readonly List<TCPHandler> handlers;
 
-        private bool alive;
+        public bool alive;
 
         public TCPServer(string host, int port, ActionExecutor actions)
         {
@@ -35,17 +35,27 @@ namespace WindowsSudo
             Debug.WriteLine("Listening on {0}:{1}", host, port);
             while (alive)
             {
-                TcpClient client = listener.AcceptTcpClient();
-                Debug.WriteLine("Client connected");
-                TCPHandler handler = new TCPHandler(client, actions);
-                handlers.Add(handler);
-                Thread clientThread = new Thread(() =>
-                {
-                    handler.Handle();
-                    handlers.Remove(handler);
-                });
 
-                clientThread.Start();
+                try
+                {
+                    TcpClient client = listener.AcceptTcpClient();
+                    Debug.WriteLine("Client connected");
+                    TCPHandler handler = new TCPHandler(client, actions);
+                    handlers.Add(handler);
+                    Thread clientThread = new Thread(() =>
+                    {
+                        handler.Handle();
+                        handlers.Remove(handler);
+                    });
+
+                    clientThread.Start();
+                }
+                catch (SocketException e)
+                {
+                    if (!alive)
+                        return;
+                    Debug.WriteLine("SocketException: {0}", e);
+                }
             }
         }
 
@@ -53,9 +63,10 @@ namespace WindowsSudo
         {
             alive = false;
 
+
             foreach (TCPHandler handler in handlers)
                 handler.Shutdown();
-            Thread.Sleep(6500);
+            Thread.Sleep(500);
             listener.Stop();
         }
 
