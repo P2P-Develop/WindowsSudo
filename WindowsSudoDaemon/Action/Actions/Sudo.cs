@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 
@@ -27,11 +28,28 @@ namespace WindowsSudo.Action.Actions
             bool new_window = input["new_window"];
             Dictionary<string, string> env = p(input["env"]);
 
-            ProcessManager.ProcessCause cause =
-                main.processManager.StartProcess(workdir, command, args, new_window, env);
-            if (cause == ProcessManager.ProcessCause.Success)
-                return Utils.success("Process created");
-            return Utils.failure(114, "a");
+            try
+            {
+                ProcessManager.ProcessInfo process =
+                    main.processManager.StartProcess(workdir, command, args, new_window, env);
+                return Utils.success("Process created", new Dictionary<string, object>
+                {
+                    { "pid", process.Id },
+                    { "path", process.FullPath },
+                });
+            }
+            catch (FileNotFoundException)
+            {
+                return Utils.failure(404, "Executable not found.");
+            }
+            catch (TypeAccessException)
+            {
+                return Utils.failure(412, "Is a directory.");
+            }
+            catch (Exception e)
+            {
+                return Utils.failure(500, e.Message);
+            }
         }
 
         private static string[] p(List<Object> o)

@@ -1,21 +1,22 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 
 namespace WindowsSudo
 {
     public class ProcessManager
     {
         private MainService main;
-        private List<int> processes;
+        private Dictionary<int, ProcessInfo> processes;
 
         public ProcessManager(MainService service)
         {
             main = service;
-            processes = new List<int>();
+            processes = new Dictionary<int, ProcessInfo>();
         }
 
-        public ProcessCause StartProcess(string workingDir,
+        public ProcessInfo StartProcess(string workingDir,
             string name,
             string[] args,
             bool newWindow,
@@ -27,27 +28,26 @@ namespace WindowsSudo
             if (path == null)
             {
                 Debug.WriteLine("Could not find " + name);
-                return ProcessCause.ExecutableNotFound;
+                throw new FileNotFoundException("Could not find" + name);
             }
             else if (path.Length == 0)
             {
                 Debug.WriteLine(name + " is a directory.");
-                return ProcessCause.ExecutableIsDirectory;
+                throw new TypeAccessException(name + " is a directory.");
             }
 
             try
             {
-                ActuallyStart(path, args, workingDir, env);
-                return ProcessCause.Success;
+                return ActuallyStart(path, args, workingDir, env);
             }
             catch (Exception e)
             {
                 Debug.WriteLine("Could not start " + name + ": " + e.Message);
-                return ProcessCause.ErrorUnk;
+                throw new Exception("Unknown");
             }
         }
 
-        private void ActuallyStart(string path, string[] args, string workingDir, Dictionary<string, string> env)
+        private ProcessInfo ActuallyStart(string path, string[] args, string workingDir, Dictionary<string, string> env)
         {
 
             ProcessStartInfo startInfo = new ProcessStartInfo(path);
@@ -70,12 +70,33 @@ namespace WindowsSudo
 
             process.Start();
 
-            processes.Add(process.Id);
+            ProcessInfo info = new ProcessInfo(process.Id, path, workingDir, args, env);
 
+            processes.Add(process.Id, info);
+
+            return info;
         }
 
         public class ProcessInfo
         {
+            public int Id { get; set; }
+
+            public string FullPath { get; set; }
+
+            public string WorkingDir { get; set; }
+
+            public string[] Args { get; set; }
+
+            public Dictionary<string, string> Env { get; set; }
+
+            public ProcessInfo(int id, string fullPath, string workingDir, string[] args, Dictionary<string, string> env)
+            {
+                Id = id;
+                FullPath = fullPath;
+                WorkingDir = workingDir;
+                Args = args;
+                Env = env;
+            }
 
         }
 
