@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.Remoting.Lifetime;
@@ -31,15 +32,14 @@ namespace WindowsSudo
         public void Start()
         {
             listener.Start();
-            Console.WriteLine("Listening on {0}:{1}", host, port);
+            Debug.WriteLine("Listening on {0}:{1}", host, port);
             while (alive)
             {
                 TcpClient client = listener.AcceptTcpClient();
-                Console.WriteLine("Client connected");
+                Debug.WriteLine("Client connected");
                 TCPHandler handler = new TCPHandler(client, actions);
                 handlers.Add(handler);
-                Thread clientThread = null;
-                clientThread = new Thread(() =>
+                Thread clientThread = new Thread(() =>
                 {
                     handler.Handle();
                     handlers.Remove(handler);

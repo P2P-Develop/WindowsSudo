@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ServiceProcess;
+using System.Threading;
 using WindowsSudo.Action;
 using WindowsSudo.Action.Actions;
 
@@ -12,12 +13,14 @@ namespace WindowsSudo
 
         public ActionExecutor actions;
         public TCPServer server;
+        public Thread serverThread;
 
         public MainService()
         {
             InitializeComponent();
             actions = new ActionExecutor(this);
             server = new TCPServer("127.0.0.1", 14105, actions);
+            serverThread = new Thread(start: () => server.Start());
 
             registerActions();
 
@@ -33,7 +36,7 @@ namespace WindowsSudo
 
         protected override void OnStart(string[] args)
         {
-            server.Start();
+            serverThread.Start();
         }
 
         protected override void OnStop()
@@ -44,8 +47,8 @@ namespace WindowsSudo
         public void TestStartupAndStop(string[] args)
         {
             this.OnStart(args);
-            Console.ReadLine();
-            this.OnStop();
+            while(true)
+                Thread.Sleep(100);
         }
     }
 }

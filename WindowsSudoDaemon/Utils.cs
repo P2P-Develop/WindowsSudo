@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace WindowsSudo
 {
@@ -22,21 +23,21 @@ namespace WindowsSudo
 
                 if (!args.ContainsKey(kvp.Key))
                 {
-                    Console.WriteLine("Missing argument: " + kvp.Key);
+                    Debug.WriteLine("Missing argument: " + kvp.Key);
                     missing.Add(kvp.Key);
                     continue;
                 }
 
                 if (args[kvp.Key].GetType() != kvp.Value)
                 {
-                    Console.WriteLine("Invalid argument: " + kvp.Key);
+                    Debug.WriteLine("Invalid argument: " + kvp.Key);
                     missing.Add(kvp.Key);
                     continue;
                 }
 
                 if (allowNull != null && allowNull.Contains(kvp.Key) && args[kvp.Key] == null)
                 {
-                    Console.WriteLine("Invalid argument: " + kvp.Key);
+                    Debug.WriteLine("Invalid argument: " + kvp.Key);
                     missing.Add(kvp.Key);
                 }
             }
