@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 
@@ -25,7 +26,22 @@ namespace WindowsSudo.Action
         {
             if (!actions.ContainsKey(name))
                 throw new ActionNotFoundException("Action not found.");
-            return actions[name].execute(main, client, args);
+
+            IActionBase action = actions[name];
+
+            if (action.Arguments != null)
+            {
+                if (!args.ContainsKey("args"))
+                    throw new ArgumentException("Action requires arguments.");
+
+                List<string> missingKeys;
+                if ((missingKeys = Utils.checkArgs(action.Arguments, args["args"])).Count > 1)
+                    throw new ArgumentException("Missing arguments: " + string.Join(", ", missingKeys));
+
+                return action.execute(main, client, args["args"]);
+            }
+
+            return action.execute(main, client, new Dictionary<string, dynamic>());
         }
     }
 }

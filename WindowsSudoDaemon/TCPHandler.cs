@@ -102,6 +102,13 @@ namespace WindowsSudo
             {
                 return actions.executeAction(request["action"], client, request);
             }
+            catch (ArgumentException)
+            {
+                response["success"] = false;
+                response["code"] = 400;
+                response["message"] = "Invalid or missing arguments";
+                return response;
+            }
             catch (ActionNotFoundException)
             {
                 response["success"] = false;
