@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using Newtonsoft.Json.Linq;
 
 namespace WindowsSudo.Action
 {
@@ -38,10 +39,34 @@ namespace WindowsSudo.Action
                 if ((missingKeys = Utils.checkArgs(action.Arguments, args["args"])).Count > 1)
                     throw new ArgumentException("Missing arguments: " + string.Join(", ", missingKeys));
 
-                return action.execute(main, client, args["args"]);
+                return action.execute(main, client, ConvertJObject(args["args"]));
             }
 
             return action.execute(main, client, new Dictionary<string, dynamic>());
         }
+
+        private static dynamic ConvertJObject(dynamic dyn)
+        {
+            if (dyn.GetType() == typeof(JObject))
+            {
+                Dictionary<string, dynamic> response = new Dictionary<string, dynamic>();
+                foreach(var prop in dyn)
+                    if (prop.GetType() == typeof(JProperty))
+                        response.Add(prop.Name, ConvertJObject(prop.Value));
+                    else
+                        response.Add(prop.Key, ConvertJObject(prop.Value));
+                return response;
+            }
+            else if (dyn.GetType() == typeof(JArray))
+            {
+                List<dynamic> response = new List<dynamic>();
+                foreach(var item in dyn)
+                    response.Add(ConvertJObject(item));
+                return response;
+            }
+
+            return dyn;
+        }
+
     }
 }
