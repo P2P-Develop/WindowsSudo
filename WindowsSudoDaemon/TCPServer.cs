@@ -1,9 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.Remoting.Lifetime;
 using System.Threading;
 using WindowsSudo.Action;
 
@@ -11,11 +9,11 @@ namespace WindowsSudo
 {
     public class TCPServer
     {
-        private readonly string host;
-        private readonly int port;
         private readonly ActionExecutor actions;
-        private readonly TcpListener listener;
         private readonly List<TCPHandler> handlers;
+        private readonly string host;
+        private readonly TcpListener listener;
+        private readonly int port;
 
         public bool alive;
 
@@ -34,8 +32,6 @@ namespace WindowsSudo
             listener.Start();
             Debug.WriteLine("Listening on {0}:{1}", host, port);
             while (alive)
-            {
-
                 try
                 {
                     TcpClient client = listener.AcceptTcpClient();
@@ -56,7 +52,6 @@ namespace WindowsSudo
                         return;
                     Debug.WriteLine("SocketException: {0}", e);
                 }
-            }
         }
 
         public void Stop()
@@ -69,6 +64,5 @@ namespace WindowsSudo
             Thread.Sleep(500);
             listener.Stop();
         }
-
     }
 }

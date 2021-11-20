@@ -11,11 +11,12 @@ namespace WindowsSudo.Action.Actions
 
         public Dictionary<string, Type> Arguments => null;
 
-        public Dictionary<string, dynamic> execute(MainService main, TcpClient client, Dictionary<string, dynamic> input)
+        public Dictionary<string, dynamic> execute(MainService main, TcpClient client,
+            Dictionary<string, dynamic> input)
         {
             return Utils.success(new Dictionary<string, dynamic>
             {
-                {"version", Assembly.GetExecutingAssembly().GetName().Version.ToString()}
+                { "version", Assembly.GetExecutingAssembly().GetName().Version.ToString() }
             });
         }
     }

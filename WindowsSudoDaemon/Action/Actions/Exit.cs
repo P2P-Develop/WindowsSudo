@@ -4,7 +4,7 @@ using System.Net.Sockets;
 
 namespace WindowsSudo.Action.Actions
 {
-    public class Exit: IActionBase
+    public class Exit : IActionBase
     {
         public string Name => "exit";
 

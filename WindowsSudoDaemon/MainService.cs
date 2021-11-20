@@ -1,5 +1,4 @@
-﻿using System;
-using System.ServiceProcess;
+﻿using System.ServiceProcess;
 using System.Threading;
 using WindowsSudo.Action;
 using WindowsSudo.Action.Actions;
@@ -12,8 +11,8 @@ namespace WindowsSudo
 
 
         public ActionExecutor actions;
-        public TCPServer server;
         public ProcessManager processManager;
+        public TCPServer server;
         public Thread serverThread;
 
         public MainService()
@@ -21,13 +20,12 @@ namespace WindowsSudo
             InitializeComponent();
             actions = new ActionExecutor(this);
             server = new TCPServer("127.0.0.1", 14105, actions);
-            serverThread = new Thread(start: () => server.Start());
+            serverThread = new Thread(() => server.Start());
             processManager = new ProcessManager(this);
 
             registerActions();
 
             Instance = this;
-
         }
 
 
@@ -50,8 +48,8 @@ namespace WindowsSudo
 
         public void TestStartupAndStop(string[] args)
         {
-            this.OnStart(args);
-            while(server.alive)
+            OnStart(args);
+            while (server.alive)
                 Thread.Sleep(100);
         }
     }

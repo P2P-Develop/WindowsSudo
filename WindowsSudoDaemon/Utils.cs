@@ -9,7 +9,7 @@ namespace WindowsSudo
     public class Utils
     {
         /// <summary>
-        /// Returns a dictionary of missing argument names or invalid argument names.
+        ///     Returns a dictionary of missing argument names or invalid argument names.
         /// </summary>
         /// <param name="required">Required arguments dictionary,</param>
         /// <param name="args">Provided arguments dictionary.</param>
@@ -18,12 +18,10 @@ namespace WindowsSudo
             Dictionary<string, object> args,
             List<string> allowNull = null)
         {
-
             List<string> missing = new List<string>();
 
             foreach (KeyValuePair<string, Type> kvp in required)
             {
-
                 if (!args.ContainsKey(kvp.Key))
                 {
                     Debug.WriteLine("Missing argument: " + kvp.Key);
@@ -76,7 +74,6 @@ namespace WindowsSudo
                 {
                     Debug.WriteLine("Invalid argument: " + kvp.Key);
                     missing.Add(kvp.Key);
-                    continue;
                 }
             }
 
@@ -85,26 +82,28 @@ namespace WindowsSudo
 
         public static string ResolvePath(string name, string workingDir, string env_path, string env_path_ext)
         {
-            string p = workingDir + ";" + env_path + ";";
-            string[] search_paths = p.Split(';');
+            var p = workingDir + ";" + env_path + ";";
+            var search_paths = p.Split(';');
 
-            bool isdir = false;
+            var isdir = false;
 
-            foreach (string path in search_paths)
+            foreach (var path in search_paths)
             {
-                string full_path = Path.Combine(path, name);
+                var full_path = Path.Combine(path, name);
 
                 if (File.Exists(full_path))
                     if (IsFile(full_path))
                         return full_path;
                     else
                         isdir = true;
-                foreach (string ext in env_path_ext.Split(';'))
+                foreach (var ext in env_path_ext.Split(';'))
                 {
-                    string exp = full_path + ext;
+                    var exp = full_path + ext;
                     if (File.Exists(exp))
                         if (IsFile(exp))
+                        {
                             return exp;
+                        }
                         else
                         {
                             isdir = true;
@@ -124,35 +123,51 @@ namespace WindowsSudo
             return (File.GetAttributes(path) & FileAttributes.Archive) != 0;
         }
 
-        public static Dictionary<string, dynamic> failure(int code, string message) => new Dictionary<string, dynamic>()
+        public static Dictionary<string, dynamic> failure(int code, string message)
         {
-            { "success", false },
-            { "code", code },
-            { "message", message }
-        };
+            return new Dictionary<string, dynamic>
+            {
+                { "success", false },
+                { "code", code },
+                { "message", message }
+            };
+        }
 
-        public static Dictionary<string, dynamic> success() => new Dictionary<string, dynamic>()
+        public static Dictionary<string, dynamic> success()
         {
-            { "success", true }
-        };
+            return new Dictionary<string, dynamic>
+            {
+                { "success", true }
+            };
+        }
 
-        public static Dictionary<string, dynamic> success(string message) => new Dictionary<string, dynamic>()
+        public static Dictionary<string, dynamic> success(string message)
         {
-            { "success", true },
-            { "message", message }
-        };
+            return new Dictionary<string, dynamic>
+            {
+                { "success", true },
+                { "message", message }
+            };
+        }
 
-        public static Dictionary<string, dynamic> success(string message, dynamic data) => new Dictionary<string, dynamic>()
+        public static Dictionary<string, dynamic> success(string message, dynamic data)
         {
-            { "success", true },
-            { "message", message },
-            { "data", data }
-        };
-        public static Dictionary<string, dynamic> success(dynamic data) => new Dictionary<string, dynamic>()
+            return new Dictionary<string, dynamic>
+            {
+                { "success", true },
+                { "message", message },
+                { "data", data }
+            };
+        }
+
+        public static Dictionary<string, dynamic> success(dynamic data)
         {
-            { "success", true },
-            { "message", "OK" },
-            { "data", data }
-        };
+            return new Dictionary<string, dynamic>
+            {
+                { "success", true },
+                { "message", "OK" },
+                { "data", data }
+            };
+        }
     }
 }

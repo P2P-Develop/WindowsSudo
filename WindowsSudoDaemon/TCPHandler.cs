@@ -12,9 +12,9 @@ namespace WindowsSudo
 {
     public class TCPHandler
     {
-        private TcpClient client;
-        private ActionExecutor actions;
-        private NetworkStream stream;
+        private readonly ActionExecutor actions;
+        private readonly TcpClient client;
+        private readonly NetworkStream stream;
         private bool alive;
 
         public TCPHandler(TcpClient client, ActionExecutor actions)
@@ -35,7 +35,7 @@ namespace WindowsSudo
                     StringBuilder received_reqeust = new StringBuilder();
                     while (stream.DataAvailable && alive)
                     {
-                        byte[] in_buffer = new byte[1024];
+                        var in_buffer = new byte[1024];
                         try
                         {
                             stream.Read(in_buffer, 0, in_buffer.Length);
@@ -47,16 +47,17 @@ namespace WindowsSudo
                                 break;
                             continue;
                         }
-                        char[] in_char = Encoding.ASCII.GetChars(in_buffer);
+
+                        var in_char = Encoding.ASCII.GetChars(in_buffer);
 
                         received_reqeust.Append(in_char);
                     }
 
                     if (received_reqeust.Length > 0)
                     {
-                        string request = received_reqeust.ToString();
+                        var request = received_reqeust.ToString();
                         Dictionary<string, dynamic> response = HandleRequest(request);
-                        byte[] out_buffer = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(response));
+                        var out_buffer = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(response));
                         stream.Write(out_buffer, 0, out_buffer.Length);
                         stream.Flush();
                     }
@@ -67,7 +68,6 @@ namespace WindowsSudo
                 Debug.WriteLine(e.Message);
             }
         }
-
 
 
         public void Send(byte[] bytes)
@@ -84,13 +84,14 @@ namespace WindowsSudo
         public Dictionary<string, dynamic> HandleRequest(string requestString)
         {
             Dictionary<string, dynamic> response = new Dictionary<string, dynamic>();
-            Dictionary<string, dynamic> request = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(requestString);
+            Dictionary<string, dynamic> request =
+                JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(requestString);
 
             List<string> missingKeys;
 
-            if ((missingKeys = Utils.checkArgs(new Dictionary<string, Type>()
+            if ((missingKeys = Utils.checkArgs(new Dictionary<string, Type>
             {
-                {"action", typeof(string)},
+                { "action", typeof(string) }
             }, request)).Count > 0)
             {
                 response["success"] = false;
@@ -130,8 +131,6 @@ namespace WindowsSudo
             alive = false;
             Send("{\"exit\": true}");
             client.Close();
-
         }
-
     }
 }

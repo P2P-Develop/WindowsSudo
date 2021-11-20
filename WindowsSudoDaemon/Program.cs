@@ -1,21 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WindowsSudo
+﻿namespace WindowsSudo
 {
-    static class Program
+    internal static class Program
     {
         /// <summary>
-        /// アプリケーションのメイン エントリ ポイントです。
+        ///     アプリケーションのメイン エントリ ポイントです。
         /// </summary>
-        static void Main()
+        private static void Main()
         {
 #if DEBUG
-                Debug();
+            Debug();
 #else
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
@@ -26,10 +19,10 @@ namespace WindowsSudo
 #endif
         }
 
-        static void Debug()
+        private static void Debug()
         {
             MainService service = new MainService();
-            service.TestStartupAndStop(new string[]{});
+            service.TestStartupAndStop(new string[] { });
         }
     }
 }

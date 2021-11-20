@@ -12,15 +12,16 @@ namespace WindowsSudo.Action.Actions
 
         public Dictionary<string, Type> Arguments => new Dictionary<string, Type>
         {
-            {"command", typeof(string)},
-            {"args", typeof(string[])},
-            {"new_window", typeof(bool)},
-            {"workdir", typeof(string)},
-            {"env", typeof(Dictionary<string, string>)},
-            {"user", typeof(string)}
+            { "command", typeof(string) },
+            { "args", typeof(string[]) },
+            { "new_window", typeof(bool) },
+            { "workdir", typeof(string) },
+            { "env", typeof(Dictionary<string, string>) },
+            { "user", typeof(string) }
         };
 
-        public Dictionary<string, dynamic> execute(MainService main, TcpClient client, Dictionary<string, dynamic> input)
+        public Dictionary<string, dynamic> execute(MainService main, TcpClient client,
+            Dictionary<string, dynamic> input)
         {
             string workdir = input["workdir"];
             string command = input["command"];
@@ -35,7 +36,7 @@ namespace WindowsSudo.Action.Actions
                 return Utils.success("Process created", new Dictionary<string, object>
                 {
                     { "pid", process.Id },
-                    { "path", process.FullPath },
+                    { "path", process.FullPath }
                 });
             }
             catch (FileNotFoundException)
@@ -52,7 +53,7 @@ namespace WindowsSudo.Action.Actions
             }
         }
 
-        private static string[] p(List<Object> o)
+        private static string[] p(List<object> o)
         {
             return o.Cast<string>().ToArray();
         }
@@ -61,8 +62,5 @@ namespace WindowsSudo.Action.Actions
         {
             return o.ToDictionary(x => x.Key, x => x.Value.ToString());
         }
-
-
-
     }
 }

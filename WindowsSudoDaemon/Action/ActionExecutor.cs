@@ -7,8 +7,8 @@ namespace WindowsSudo.Action
 {
     public class ActionExecutor
     {
-        private Dictionary<string, IActionBase> actions;
-        private MainService main;
+        private readonly Dictionary<string, IActionBase> actions;
+        private readonly MainService main;
 
         public ActionExecutor(MainService main)
         {
@@ -23,7 +23,8 @@ namespace WindowsSudo.Action
             actions.Add(action.Name, action);
         }
 
-        public Dictionary<string, dynamic> executeAction(string name, TcpClient client, Dictionary<string, dynamic> args)
+        public Dictionary<string, dynamic> executeAction(string name, TcpClient client,
+            Dictionary<string, dynamic> args)
         {
             if (!actions.ContainsKey(name))
                 throw new ActionNotFoundException("Action not found.");
@@ -50,23 +51,23 @@ namespace WindowsSudo.Action
             if (dyn.GetType() == typeof(JObject))
             {
                 Dictionary<string, dynamic> response = new Dictionary<string, dynamic>();
-                foreach(var prop in dyn)
+                foreach (var prop in dyn)
                     if (prop.GetType() == typeof(JProperty))
                         response.Add(prop.Name, ConvertJObject(prop.Value));
                     else
                         response.Add(prop.Key, ConvertJObject(prop.Value));
                 return response;
             }
-            else if (dyn.GetType() == typeof(JArray))
+
+            if (dyn.GetType() == typeof(JArray))
             {
                 List<dynamic> response = new List<dynamic>();
-                foreach(var item in dyn)
+                foreach (var item in dyn)
                     response.Add(ConvertJObject(item));
                 return response;
             }
 
             return dyn;
         }
-
     }
 }
