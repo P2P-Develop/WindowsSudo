@@ -13,6 +13,7 @@ namespace WindowsSudo
 
         public ActionExecutor actions;
         public TCPServer server;
+        public ProcessManager processManager;
         public Thread serverThread;
 
         public MainService()
@@ -21,6 +22,7 @@ namespace WindowsSudo
             actions = new ActionExecutor(this);
             server = new TCPServer("127.0.0.1", 14105, actions);
             serverThread = new Thread(start: () => server.Start());
+            processManager = new ProcessManager(this);
 
             registerActions();
 
@@ -33,6 +35,7 @@ namespace WindowsSudo
         {
             actions.registerAction(new Exit());
             actions.registerAction(new Info());
+            actions.registerAction(new Sudo());
         }
 
         protected override void OnStart(string[] args)
