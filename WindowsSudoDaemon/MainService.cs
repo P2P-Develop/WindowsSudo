@@ -32,6 +32,7 @@ namespace WindowsSudo
         private void registerActions()
         {
             actions.registerAction(new Exit());
+            actions.registerAction(new Info());
         }
 
         protected override void OnStart(string[] args)

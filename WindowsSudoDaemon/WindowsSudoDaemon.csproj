@@ -56,6 +56,7 @@
     <Compile Include="Action\ActionExecutor.cs" />
     <Compile Include="Action\ActionNotFoundException.cs" />
     <Compile Include="Action\Actions\Exit.cs" />
+    <Compile Include="Action\Actions\Info.cs" />
     <Compile Include="Action\IActionBase.cs" />
     <Compile Include="MainService.cs">
       <SubType>Component</SubType>
