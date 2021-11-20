@@ -1,4 +1,5 @@
-﻿using System.ServiceProcess;
+﻿using System;
+using System.ServiceProcess;
 using WindowsSudo.Action;
 using WindowsSudo.Action.Actions;
 
@@ -38,6 +39,13 @@ namespace WindowsSudo
         protected override void OnStop()
         {
             server.Stop();
+        }
+
+        public void TestStartupAndStop(string[] args)
+        {
+            this.OnStart(args);
+            Console.ReadLine();
+            this.OnStop();
         }
     }
 }

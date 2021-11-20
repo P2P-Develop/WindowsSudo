@@ -16,7 +16,7 @@ namespace WindowsSudo
         private readonly TcpListener listener;
         private readonly List<TCPHandler> handlers;
 
-        private bool alaive;
+        private bool alive;
 
         public TCPServer(string host, int port, ActionExecutor actions)
         {
@@ -25,14 +25,14 @@ namespace WindowsSudo
             this.actions = actions;
             handlers = new List<TCPHandler>();
             listener = new TcpListener(IPAddress.Parse(host), port);
-            alaive = true;
+            alive = true;
         }
 
         public void Start()
         {
             listener.Start();
             Console.WriteLine("Listening on {0}:{1}", host, port);
-            while (alaive)
+            while (alive)
             {
                 TcpClient client = listener.AcceptTcpClient();
                 Console.WriteLine("Client connected");
@@ -51,7 +51,7 @@ namespace WindowsSudo
 
         public void Stop()
         {
-            alaive = false;
+            alive = false;
 
             foreach (TCPHandler handler in handlers)
                 handler.Shutdown();

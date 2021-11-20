@@ -14,12 +14,22 @@ namespace WindowsSudo
         /// </summary>
         static void Main()
         {
+#if DEBUG
+                Debug();
+#else
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
                 new MainService()
             };
             ServiceBase.Run(ServicesToRun);
+#endif
+        }
+
+        static void Debug()
+        {
+            MainService service = new MainService();
+            service.TestStartupAndStop(new string[]{});
         }
     }
 }
