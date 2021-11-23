@@ -43,6 +43,8 @@
         <Reference Include="System" />
         <Reference Include="System.Configuration.Install" />
         <Reference Include="System.Core" />
+        <Reference Include="System.DirectoryServices" />
+        <Reference Include="System.DirectoryServices.AccountManagement" />
         <Reference Include="System.Management" />
         <Reference Include="System.Runtime.Serialization, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
             <HintPath>C:\WINDOWS\Microsoft.Net\assembly\GAC_MSIL\System.Runtime.Serialization\v4.0_4.0.0.0__b77a5c561934e089\System.Runtime.Serialization.dll</HintPath>
