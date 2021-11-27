@@ -6,7 +6,7 @@ namespace WindowsSudo
 {
     public static class CredentialHelper
     {
-        private static HashSet<string> domains_cache = new HashSet<string>();
+        private static readonly HashSet<string> domains_cache = new HashSet<string>();
 
         public static bool DomainExist(string domain)
         {
@@ -34,7 +34,6 @@ namespace WindowsSudo
             {
                 return UserPrincipal.FindByIdentity(context, IdentityType.SamAccountName, username) != null;
             }
-
         }
 
         public static bool ValidateAccount(string name, string password)
@@ -43,7 +42,7 @@ namespace WindowsSudo
 
             try
             {
-                using(PrincipalContext pc = new PrincipalContext(ct))
+                using (PrincipalContext pc = new PrincipalContext(ct))
                 {
                     return pc.ValidateCredentials(name, password);
                 }
@@ -58,7 +57,7 @@ namespace WindowsSudo
         {
             try
             {
-                using(PrincipalContext pc = new PrincipalContext(ContextType.Domain, domain))
+                using (PrincipalContext pc = new PrincipalContext(ContextType.Domain, domain))
                 {
                     return pc.ValidateCredentials(name, password);
                 }
