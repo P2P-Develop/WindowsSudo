@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
+using System.Security;
+using System.Security.Authentication;
 
 namespace WindowsSudo
 {
@@ -29,7 +32,10 @@ namespace WindowsSudo
             string name,
             string[] args,
             bool newWindow,
-            Dictionary<string, string> env)
+            Dictionary<string, string> env,
+            string username,
+            string password,
+            string domain)
         {
             var path = Utils.ResolvePath(name, workingDir, Environment.GetEnvironmentVariable("PATH"),
                 Environment.GetEnvironmentVariable("PATHEXT"));
@@ -46,9 +52,40 @@ namespace WindowsSudo
                 throw new TypeAccessException(name + " is a directory.");
             }
 
+
+            // Check credential
+            if (username != null)
+            {
+                if (CredentialHelper.ACAvailable())
+                    if (CredentialHelper.DomainExist(domain))
+                    {
+                        Debug.WriteLine("Could not find domain " + domain);
+                        throw new CredentialHelper.Exceptions.DomainNotFoundException("Could not find domain " + domain);
+                    }
+
+                if (!CredentialHelper.UserExists(username))
+                {
+                    Debug.WriteLine("Could not find user " + username);
+                    throw new CredentialHelper.Exceptions.UserNotFoundException("Could not find user " + username);
+                }
+
+                if (password == null)
+                {
+                    // TODO: Password caching
+                    Debug.WriteLine("Password is null");
+                    throw new CredentialHelper.Exceptions.BadPasswordException("Password is null");
+                }
+
+                if (!CredentialHelper.ValidateAccount(username, password, domain))
+                {
+                    Debug.WriteLine("Could not check credential");
+                    throw new CredentialHelper.Exceptions.BadPasswordException("Could not check credential");
+                }
+            }
+
             try
             {
-                return ActuallyStart(path, args, workingDir, env);
+                return ActuallyStart(path, args, workingDir, env, username, password, domain);
             }
             catch (Exception e)
             {
@@ -57,17 +94,28 @@ namespace WindowsSudo
             }
         }
 
-        private ProcessInfo ActuallyStart(string path, string[] args, string workingDir, Dictionary<string, string> env)
+        private ProcessInfo ActuallyStart(string path, string[] args, string workingDir, Dictionary<string, string> env,
+            string username, string password, string domain)
         {
             ProcessStartInfo startInfo = new ProcessStartInfo(path);
+
             startInfo.Arguments = string.Join(" ", args);
             startInfo.WorkingDirectory = workingDir;
             startInfo.UseShellExecute = false;
+
             startInfo.RedirectStandardOutput = true;
             startInfo.RedirectStandardError = true;
 
             foreach (KeyValuePair<string, string> kv in env)
                 startInfo.EnvironmentVariables[kv.Key] = kv.Value;
+
+            if (username != null)
+            {
+                startInfo.UserName = username;
+                startInfo.Password = new NetworkCredential("", password).SecurePassword;
+                startInfo.Domain = domain;
+                startInfo.LoadUserProfile = true;
+            }
 
             Process process = new Process();
             process.StartInfo = startInfo;

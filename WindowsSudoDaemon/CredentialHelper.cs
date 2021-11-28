@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.DirectoryServices.AccountManagement;
 using System.DirectoryServices.ActiveDirectory;
+using System.Runtime.Serialization;
 
 namespace WindowsSudo
 {
@@ -78,6 +80,34 @@ namespace WindowsSudo
             catch (ActiveDirectoryObjectNotFoundException)
             {
                 return false;
+            }
+        }
+
+        public static class Exceptions
+        {
+            [Serializable()]
+            public class UserNotFoundException : Exception
+            {
+                public UserNotFoundException(string message) : base(message) { }
+                public UserNotFoundException(string message, Exception innerException) : base(message, innerException) { }
+                protected UserNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+            }
+
+            [Serializable()]
+            public class BadPasswordException : Exception
+            {
+                public BadPasswordException(string message) : base(message) { }
+                public BadPasswordException(string message, Exception innerException) : base(message, innerException) { }
+                protected BadPasswordException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+            }
+
+
+            [Serializable()]
+            public class DomainNotFoundException : Exception
+            {
+                public DomainNotFoundException(string message) : base(message) { }
+                public DomainNotFoundException(string message, Exception innerException) : base(message, innerException) { }
+                protected DomainNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context) { }
             }
         }
     }

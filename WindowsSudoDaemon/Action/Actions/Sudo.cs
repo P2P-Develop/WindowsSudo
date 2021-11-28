@@ -16,8 +16,7 @@ namespace WindowsSudo.Action.Actions
             { "args", typeof(string[]) },
             { "new_window", typeof(bool) },
             { "workdir", typeof(string) },
-            { "env", typeof(Dictionary<string, string>) },
-            { "user", typeof(string) }
+            { "env", typeof(Dictionary<string, string>) }
         };
 
         public Dictionary<string, dynamic> execute(MainService main, TcpClient client,
@@ -29,15 +28,43 @@ namespace WindowsSudo.Action.Actions
             bool new_window = input["new_window"];
             Dictionary<string, string> env = p(input["env"]);
 
+            string password, username, domain;
+
+            if (input.ContainsKey("username"))
+            {
+                username = input["username"];
+                domain = input.ContainsKey("domain") ? input["domain"] : null;
+                password = input.ContainsKey("password") ? input["password"] : null;
+            }
+            else
+            {
+                username = null;
+                domain = null;
+                password = null;
+            }
+
             try
             {
                 ProcessManager.ProcessInfo process =
-                    main.processManager.StartProcess(workdir, command, args, new_window, env);
+                    main.processManager.StartProcess(workdir, command, args, new_window, env,
+                        username, password, domain);
                 return Utils.success("Process created", new Dictionary<string, object>
                 {
                     { "pid", process.Id },
                     { "path", process.FullPath }
                 });
+            }
+            catch (CredentialHelper.Exceptions.UserNotFoundException)
+            {
+                return Utils.failure(400, "User not found");
+            }
+            catch (CredentialHelper.Exceptions.BadPasswordException)
+            {
+                return Utils.failure(400, "Bad password");
+            }
+            catch (CredentialHelper.Exceptions.DomainNotFoundException)
+            {
+                return Utils.failure(400, "Domain not found");
             }
             catch (FileNotFoundException)
             {
