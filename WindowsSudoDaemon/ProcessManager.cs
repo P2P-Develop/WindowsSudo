@@ -99,7 +99,7 @@ namespace WindowsSudo
         {
             ProcessStartInfo startInfo = new ProcessStartInfo(path);
 
-            startInfo.Arguments = string.Join(" ", args);
+            startInfo.Arguments = Utils.escapeArgsAsString(args);
             startInfo.WorkingDirectory = workingDir;
             startInfo.UseShellExecute = false;
 

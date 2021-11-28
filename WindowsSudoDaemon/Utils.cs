@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 
 namespace WindowsSudo
@@ -44,6 +45,20 @@ namespace WindowsSudo
             }
 
             return missing;
+        }
+
+        public static string escapeArgsAsString(string[] args)
+        {
+            string result = "";
+            foreach(string arg in args)
+            {
+                if (result.Length != 0)
+                    result += " ";
+                result += Regex.Replace(Regex.Replace(arg, "(\\\\*)\"", "$1\\$0"),
+                    "^(.*\\s.*?)(\\\\*)$", "\"$1$2$2\"");
+            }
+
+            return result;
         }
 
         public static List<string> checkArgs(Dictionary<string, Type> required, JObject obj)
