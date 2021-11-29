@@ -85,7 +85,7 @@ namespace WindowsSudo
 
             try
             {
-                return ActuallyStart(path, args, workingDir, env, username, password, domain);
+                return ActuallyStart(path, args, newWindow, workingDir, env, username, password, domain);
             }
             catch (Exception e)
             {
@@ -94,7 +94,8 @@ namespace WindowsSudo
             }
         }
 
-        private ProcessInfo ActuallyStart(string path, string[] args, string workingDir, Dictionary<string, string> env,
+        private ProcessInfo ActuallyStart(string path, string[] args, bool window,
+            string workingDir, Dictionary<string, string> env,
             string username, string password, string domain)
         {
             ProcessStartInfo startInfo = new ProcessStartInfo(path);
@@ -102,6 +103,7 @@ namespace WindowsSudo
             startInfo.Arguments = Utils.escapeArgsAsString(args);
             startInfo.WorkingDirectory = workingDir;
             startInfo.UseShellExecute = false;
+            startInfo.CreateNoWindow = !window;
 
             startInfo.RedirectStandardOutput = true;
             startInfo.RedirectStandardError = true;
