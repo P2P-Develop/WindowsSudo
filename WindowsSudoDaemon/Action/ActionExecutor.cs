@@ -67,6 +67,9 @@ namespace WindowsSudo.Action
                 return response;
             }
 
+            if (dyn.GetType() == typeof(JValue))
+                return ((JValue)dyn).Value;
+
             return dyn;
         }
     }
