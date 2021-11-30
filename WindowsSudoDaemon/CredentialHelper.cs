@@ -66,16 +66,33 @@ namespace WindowsSudo
             if (password == null)
             {
                 if (!DomainExists(domain))
-                    throw new Exceptions.DomainNotFoundException("Could not find domain " + domain);
+                    if (exception)
+                        throw new Exceptions.DomainNotFoundException("Could not find domain " + domain);
+                    else
+                        return false;
+
                 if (!UserExists(name, domain))
-                    throw new Exceptions.UserNotFoundException("Could not find user " + domain);
+                    if (exception)
+                        throw new Exceptions.UserNotFoundException("Could not find user " + domain);
+                    else
+                        return false;
+
                 if (UserPasswordRequired(name, domain))
-                    throw new Exceptions.PasswordRequiredException("Password required for user " + name);
+                    if (exception)
+                        throw new Exceptions.PasswordRequiredException("Password required for user " + name);
+                    else
+                        return false;
+
                 return true;
             }
             else if (!UserExists(name, domain))
-                throw new Exceptions.UserNotFoundException("Could not find user " + name);
+                if (exception)
+                    throw new Exceptions.UserNotFoundException("Could not find user " + name);
+                else
+                    return false;
 
+            if (domain == null)
+                ValidateAccount(name, password);
 
             try
             {
