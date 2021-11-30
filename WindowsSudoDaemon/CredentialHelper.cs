@@ -10,7 +10,7 @@ namespace WindowsSudo
     {
         private static readonly HashSet<string> domains_cache = new HashSet<string>();
 
-        public static bool DomainExist(string domain)
+        public static bool DomainExists(string domain)
         {
             if (domains_cache.Count != Forest.GetCurrentForest().Domains.Count)
             {
