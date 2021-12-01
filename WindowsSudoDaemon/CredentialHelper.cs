@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.DirectoryServices.AccountManagement;
 using System.DirectoryServices.ActiveDirectory;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
+using System.Security.Principal;
 
 namespace WindowsSudo
 {
@@ -24,9 +26,16 @@ namespace WindowsSudo
 
         public static bool UserExists(string username)
         {
-            using (PrincipalContext context = new PrincipalContext(ContextType.Machine))
+            try
             {
-                return UserPrincipal.FindByIdentity(context, IdentityType.SamAccountName, username) != null;
+                NTAccount acct = new NTAccount(username);
+                SecurityIdentifier id = (SecurityIdentifier)acct.Translate(typeof(SecurityIdentifier));
+
+                return id.IsAccountSid();
+            }
+            catch (IdentityNotMappedException)
+            {
+                return false;
             }
         }
 
@@ -41,6 +50,10 @@ namespace WindowsSudo
             }
         }
 
+        [DllImport("advapi32.dll")]
+        public static extern bool LogonUser(string userName, string domainName, string password, int LogonType, int LogonProvider,ref IntPtr phToken);
+
+
         public static bool ValidateAccount(string name, string password)
         {
             if (password == null &&
@@ -48,17 +61,9 @@ namespace WindowsSudo
                 !UserPasswordRequired(name))
                 return true;
 
-            try
-            {
-                using (PrincipalContext pc = new PrincipalContext(ContextType.Machine))
-                {
-                    return pc.ValidateCredentials(name, password);
-                }
-            }
-            catch (PrincipalOperationException)
-            {
-                return false;
-            }
+
+            IntPtr tokenHandler = IntPtr.Zero;
+            return LogonUser(name, "DESKTOP-G3BHBJM", password, 2, 0, ref tokenHandler);
         }
 
         public static bool ValidateAccount(string name, string password, string domain, bool exception=false)
@@ -92,7 +97,7 @@ namespace WindowsSudo
                     return false;
 
             if (domain == null)
-                ValidateAccount(name, password);
+                return ValidateAccount(name, password);
 
             try
             {
@@ -137,28 +142,8 @@ namespace WindowsSudo
 
         public static bool UserPasswordRequired(string username)
         {
-            try
-            {
-                using (PrincipalContext context = new PrincipalContext(ContextType.Machine))
-                {
-                    UserPrincipal user = UserPrincipal.FindByIdentity(context, username);
-
-                    if (null == user)
-                        return true;
-                    else
-                        user.ChangePassword("", "");
-                    return false;
-                }
-            }
-            catch (PasswordException)
-            {
-                return true;
-            }
-            catch (PrincipalOperationException)
-            {
-                return true;
-            }
-
+            IntPtr tokenHandler = IntPtr.Zero;
+            return !LogonUser(username, "", "", 2, 0, ref tokenHandler);
         }
 
         public static bool ACAvailable()

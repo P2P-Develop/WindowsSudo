@@ -23,6 +23,8 @@ namespace WindowsSudo
             serverThread = new Thread(() => server.Start());
             processManager = new ProcessManager(this);
 
+            TokenManager.Ready();
+
             registerActions();
 
             Instance = this;
@@ -34,6 +36,7 @@ namespace WindowsSudo
             actions.registerAction(new Exit());
             actions.registerAction(new Info());
             actions.registerAction(new Sudo());
+            actions.registerAction(new GenToken());
         }
 
         protected override void OnStart(string[] args)

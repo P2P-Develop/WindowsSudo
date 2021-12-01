@@ -57,7 +57,7 @@ namespace WindowsSudo
             if (username != null)
             {
                 if (CredentialHelper.ACAvailable())
-                    if (CredentialHelper.DomainExist(domain))
+                    if (CredentialHelper.DomainExists(domain))
                     {
                         Debug.WriteLine("Could not find domain " + domain);
                         throw new CredentialHelper.Exceptions.DomainNotFoundException("Could not find domain " + domain);
