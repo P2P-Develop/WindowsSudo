@@ -48,7 +48,7 @@ namespace WindowsSudo
                             continue;
                         }
 
-                        var in_char = Encoding.ASCII.GetChars(in_buffer);
+                        var in_char = Encoding.UTF8.GetChars(in_buffer);
 
                         received_reqeust.Append(in_char);
                     }
@@ -57,7 +57,7 @@ namespace WindowsSudo
                     {
                         var request = received_reqeust.ToString();
                         Dictionary<string, dynamic> response = HandleRequest(request);
-                        var out_buffer = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(response));
+                        var out_buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response));
                         stream.Write(out_buffer, 0, out_buffer.Length);
                         stream.Flush();
                     }
@@ -78,7 +78,7 @@ namespace WindowsSudo
 
         public void Send(string str)
         {
-            Send(Encoding.ASCII.GetBytes(str));
+            Send(Encoding.UTF8.GetBytes(str));
         }
 
         public Dictionary<string, dynamic> HandleRequest(string requestString)
