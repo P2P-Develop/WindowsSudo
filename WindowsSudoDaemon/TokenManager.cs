@@ -70,9 +70,11 @@ namespace WindowsSudo
                 foreach (TokenInfo tokenInfo in _tokens.Values)
                 {
                     int duration = tokenInfo.Duration -= 1;
-                    Debug.WriteLine("Token expired: " + tokenInfo.Username);
                     if (duration <= 0)
+                    {
                         _tokens.Remove(tokenInfo.Username);
+                        Debug.WriteLine("Token expired: " + tokenInfo.Username);
+                    }
                 }
             }
         }
