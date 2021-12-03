@@ -53,14 +53,31 @@ namespace WindowsSudo
                         received_reqeust.Append(in_char);
                     }
 
-                    if (received_reqeust.Length > 0)
+                    try
                     {
-                        var request = received_reqeust.ToString();
-                        Dictionary<string, dynamic> response = HandleRequest(request);
-                        var out_buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response));
-                        stream.Write(out_buffer, 0, out_buffer.Length);
-                        stream.Flush();
+                        if (received_reqeust.Length > 0)
+                        {
+                            var request = received_reqeust.ToString();
+                            Dictionary<string, dynamic> response = HandleRequest(request);
+                            var out_buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response));
+                            stream.Write(out_buffer, 0, out_buffer.Length);
+                            stream.Flush();
+                        }
                     }
+                    catch(JsonReaderException e)
+                    {
+                        Send(JsonConvert.SerializeObject(new Dictionary<string, dynamic>
+                        {
+                            {"success", false},
+                            {"code", 400},
+                            {"message", "Failed to parse request."},
+                        }));
+                    }
+                    finally
+                    {
+                        received_reqeust.Clear();
+                    }
+
                 }
             }
             catch (Exception e)
