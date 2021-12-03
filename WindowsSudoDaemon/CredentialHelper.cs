@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.DirectoryServices.AccountManagement;
 using System.DirectoryServices.ActiveDirectory;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Security.Principal;
@@ -63,7 +64,7 @@ namespace WindowsSudo
 
 
             IntPtr tokenHandler = IntPtr.Zero;
-            return LogonUser(name, "DESKTOP-G3BHBJM", password, 2, 0, ref tokenHandler);
+            return LogonUser(name, Dns.GetHostName(), password, 2, 0, ref tokenHandler);
         }
 
         public static bool ValidateAccount(string name, string password, string domain, bool exception=false)
