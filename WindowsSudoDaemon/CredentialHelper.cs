@@ -69,20 +69,27 @@ namespace WindowsSudo
 
         public static bool ValidateAccount(string name, string password, string domain, bool exception=false)
         {
+            if (domain != null && !ACAvailable())
+                if (exception)
+                    throw new Exception("Domain name specified but Active Directory is not available in this machine.");
+                else
+                    return false;
+            
+            if (domain != null && !DomainExists(domain))
+                if (exception)
+                    throw new Exceptions.DomainNotFoundException("Could not find domain " + domain);
+                else
+                    return false;
+
+            if (!UserExists(name, domain))
+                if (exception)
+                    throw new Exceptions.UserNotFoundException("Could not find user " + domain);
+                else
+                    return false;
+
+            
             if (password == null)
             {
-                if (!DomainExists(domain))
-                    if (exception)
-                        throw new Exceptions.DomainNotFoundException("Could not find domain " + domain);
-                    else
-                        return false;
-
-                if (!UserExists(name, domain))
-                    if (exception)
-                        throw new Exceptions.UserNotFoundException("Could not find user " + domain);
-                    else
-                        return false;
-
                 if (UserPasswordRequired(name, domain))
                     if (exception)
                         throw new Exceptions.PasswordRequiredException("Password required for user " + name);
@@ -91,12 +98,7 @@ namespace WindowsSudo
 
                 return true;
             }
-            else if (!UserExists(name, domain))
-                if (exception)
-                    throw new Exceptions.UserNotFoundException("Could not find user " + name);
-                else
-                    return false;
-
+            
             if (domain == null)
                 return ValidateAccount(name, password);
 
@@ -194,6 +196,14 @@ namespace WindowsSudo
                 public DomainNotFoundException(string message) : base(message) { }
                 public DomainNotFoundException(string message, Exception innerException) : base(message, innerException) { }
                 protected DomainNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+            }
+            
+            [Serializable()]
+            public class ActiveDirectoryNotAvailable : Exception
+            {
+                public ActiveDirectoryNotAvailable(string message) : base(message) { }
+                public ActiveDirectoryNotAvailable(string message, Exception innerException) : base(message, innerException) { }
+                protected ActiveDirectoryNotAvailable(SerializationInfo info, StreamingContext context) : base(info, context) { }
             }
         }
     }

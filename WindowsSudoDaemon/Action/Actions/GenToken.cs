@@ -40,6 +40,9 @@ namespace WindowsSudo.Action.Actions
             else
                 password = null;
 
+            if (username == null)
+                return Utils.failure(400, "Required credentials.");
+            
             if (!CheckCredential(domain, username, password))
             {
                 return Utils.failure(403, "Bad credential.");
