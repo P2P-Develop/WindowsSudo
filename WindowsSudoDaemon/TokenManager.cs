@@ -79,15 +79,14 @@ namespace WindowsSudo
             }
         }
 
-        public static bool ValidateToken(string username, string token, string token_priv)
+        public static bool ValidateToken(string token, string token_priv)
         {
             lock(_instance._lock)
             {
                 if (_instance._tokens.ContainsKey(token))
                 {
                     TokenInfo tokenInfo = _instance._tokens[token];
-                    return tokenInfo.Token == token && tokenInfo.Token_Priv == token_priv &&
-                           tokenInfo.Username == username;
+                    return tokenInfo.Token == token && tokenInfo.Token_Priv == token_priv;
                 }
                 else
                     return false;
