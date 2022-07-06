@@ -59,9 +59,7 @@ namespace WindowsSudo
                         {
                             var request = received_reqeust.ToString();
                             Dictionary<string, dynamic> response = HandleRequest(request);
-                            var out_buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response));
-                            stream.Write(out_buffer, 0, out_buffer.Length);
-                            stream.Flush();
+                            Send(response);
                         }
                     }
                     catch(JsonReaderException e)
@@ -86,7 +84,7 @@ namespace WindowsSudo
             }
         }
 
-
+        
         public void Send(byte[] bytes)
         {
             stream.Write(bytes, 0, bytes.Length);
@@ -96,6 +94,11 @@ namespace WindowsSudo
         public void Send(string str)
         {
             Send(Encoding.UTF8.GetBytes(str));
+        }
+        
+        public void Send(dynamic response)
+        {
+            Send(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response)));
         }
 
         public Dictionary<string, dynamic> HandleRequest(string requestString)
