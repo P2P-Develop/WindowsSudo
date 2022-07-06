@@ -116,12 +116,15 @@ namespace WindowsSudo
                 return response;
             }
 
+            Debug.WriteLine("Received request: \n" + request);
+
             try
             {
                 return actions.executeAction(request["action"], client, request);
             }
-            catch (ArgumentException)
+            catch (ArgumentException e)
             {
+                Debug.WriteLine("Missing arguments: " + e.Message);
                 response["success"] = false;
                 response["code"] = 400;
                 response["message"] = "Invalid or missing arguments";
@@ -129,6 +132,7 @@ namespace WindowsSudo
             }
             catch (ActionNotFoundException)
             {
+                Debug.WriteLine("Action not found: " + request["action"]);
                 response["success"] = false;
                 response["code"] = 404;
                 response["message"] = "Action not found";
@@ -136,6 +140,8 @@ namespace WindowsSudo
             }
             catch (Exception e)
             {
+                Debug.WriteLine("An exception has occurred: ");
+                Debug.WriteLine(e);
                 response["success"] = false;
                 response["code"] = 500;
                 response["message"] = e.Message;

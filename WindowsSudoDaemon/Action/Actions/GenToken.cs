@@ -22,6 +22,8 @@ namespace WindowsSudo.Action.Actions
 
             SelectQuery query = new SelectQuery("Win32_UserAccount");
             ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
+            
+            Debug.WriteLine("Enumerating users...");
             foreach (ManagementObject envVar in searcher.Get())
             {
                 Debug.WriteLine("Username : {0}", envVar["Name"]);
@@ -38,47 +40,56 @@ namespace WindowsSudo.Action.Actions
             else
                 password = null;
 
-            if (domain != null && !CredentialHelper.DomainExists(domain))
-                return Utils.failure(412, "Could not find domain " + domain);
-
-            if (!CredentialHelper.UserExists(username, domain))
-                return Utils.failure(404, "Could not find user " + username);
-
-            if (password == null && CredentialHelper.UserPasswordRequired(username))
-                return Utils.failure(401, "Password required.");
-
-            try
-            {
-                if (!CredentialHelper.ValidateAccount(username, password, domain, true))
-                    throw new CredentialHelper.Exceptions.BadPasswordException("Bad credential.");
-
-                TokenManager.TokenInfo token = TokenManager.GenerateToken(username, password, domain);
-
-                return Utils.success(new Dictionary<string, dynamic>
-                {
-                    { "token", token.Token },
-                    { "token_private", token.Token_Priv },
-                    { "expires_in", DateTime.Now.Second + token.Duration }
-                });
-
-            }
-            catch (CredentialHelper.Exceptions.BadPasswordException)
+            if (!CheckCredential(domain, username, password))
             {
                 return Utils.failure(403, "Bad credential.");
             }
+            
+            Debug.WriteLine("Generating token...");
+            TokenManager.TokenInfo token = TokenManager.GenerateToken(username, password, domain);
+            Debug.WriteLine("DONE");
+
+            return Utils.success(new Dictionary<string, dynamic>
+            {
+                { "token", token.Token },
+                { "token_private", token.Token_Priv },
+                { "expires_in", DateTime.Now.Second + token.Duration }
+            });
+
+        }
+        
+        private bool CheckCredential(string domain, string username, string password)
+        {
+            Debug.WriteLine("Checking provided credential is valid...");
+            
+            try
+            {
+                CredentialHelper.ValidateAccount(username, password, domain, true);
+                // Usually, ValidateAccount() returns boolean, but it always returns true because if validation fails, they throw an exception.
+                Debug.WriteLine("DONE");
+                Debug.WriteLine("Congratulations, they has been passed all tests!");
+                return true;
+            }
+            catch (CredentialHelper.Exceptions.BadPasswordException)
+            {
+                Debug.WriteLine("Domain exists(or not specified), user exists, but password is wrong. hmm...");
+                return false;
+            }
             catch (CredentialHelper.Exceptions.DomainNotFoundException)
             {
-                return Utils.failure(412, "Could not find domain " + domain);
+                Debug.WriteLine("Domain does not exist.");
+                return false;
             }
             catch (CredentialHelper.Exceptions.PasswordRequiredException)
             {
-                return Utils.failure(401, "Password required.");
+                Debug.WriteLine("Password is required, but not provided.");
+                return false;
             }
             catch (CredentialHelper.Exceptions.UserNotFoundException)
             {
-                return Utils.failure(404, "Could not find user " + username);
+                Debug.WriteLine("User does not exist.");
+                return false;
             }
-
         }
     }
 }
