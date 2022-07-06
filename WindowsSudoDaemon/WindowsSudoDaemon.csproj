@@ -81,6 +81,7 @@
             <DependentUpon>ProjectInstaller.cs</DependentUpon>
         </Compile>
         <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="RateLimiter.cs" />
         <Compile Include="TCPHandler.cs" />
         <Compile Include="TCPServer.cs" />
         <Compile Include="TokenManager.cs" />

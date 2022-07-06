@@ -14,6 +14,7 @@ namespace WindowsSudo
         public ProcessManager processManager;
         public TCPServer server;
         public Thread serverThread;
+        public RateLimiter rateLimiter;
 
         public MainService()
         {
@@ -22,7 +23,8 @@ namespace WindowsSudo
             server = new TCPServer("127.0.0.1", 14105, actions);
             serverThread = new Thread(() => server.Start());
             processManager = new ProcessManager(this);
-
+            rateLimiter = new RateLimiter(new RateLimiter.RateLimitConfig()); // TODO: load config
+            
             TokenManager.Ready();
 
             registerActions();
