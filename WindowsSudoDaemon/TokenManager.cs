@@ -124,10 +124,8 @@ namespace WindowsSudo
                 Domain = domain;
                 Duration = 15 * 60;
                 Token = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
-                Token_Priv = Convert.ToBase64String(Guid.NewGuid().ToByteArray()) +
-                        string.Join("", _instance._sha256.ComputeHash(
-                            Encoding.UTF8.GetBytes(username + password + domain + DateTime.Now
-                            )).Select(x => $"{x:x2}"));
+                Token_Priv = Convert.ToBase64String(_instance._sha256.ComputeHash(
+                    Encoding.UTF8.GetBytes(username + domain + DateTime.Now)));
             }
         }
     }
