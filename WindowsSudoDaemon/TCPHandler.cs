@@ -125,7 +125,7 @@ namespace WindowsSudo
 
             try
             {
-                return actions.executeAction(request["action"], client, request);
+                return actions.executeAction(request["action"], this, request);
             }
             catch (ArgumentException e)
             {

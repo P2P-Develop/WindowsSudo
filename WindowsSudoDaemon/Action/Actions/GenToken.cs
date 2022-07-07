@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Management;
-using System.Net.Sockets;
 
 namespace WindowsSudo.Action.Actions
 {
@@ -15,7 +14,7 @@ namespace WindowsSudo.Action.Actions
             { "username", typeof(string) }
         };
 
-        public Dictionary<string, dynamic> execute(MainService main, TcpClient client,
+        public Dictionary<string, dynamic> execute(MainService main, TCPHandler client,
             Dictionary<string, dynamic> input)
         {
             SelectQuery query = new SelectQuery("Win32_UserAccount");

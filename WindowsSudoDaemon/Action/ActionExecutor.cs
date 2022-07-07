@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Net.Sockets;
 using Newtonsoft.Json.Linq;
 
 namespace WindowsSudo.Action
@@ -23,7 +22,7 @@ namespace WindowsSudo.Action
             actions.Add(action.Name, action);
         }
 
-        public Dictionary<string, dynamic> executeAction(string name, TcpClient client,
+        public Dictionary<string, dynamic> executeAction(string name, TCPHandler client,
             Dictionary<string, dynamic> args)
         {
             if (!actions.ContainsKey(name))

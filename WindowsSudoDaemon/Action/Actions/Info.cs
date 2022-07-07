@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Net.Sockets;
 using System.Reflection;
 
 namespace WindowsSudo.Action.Actions
@@ -11,7 +10,7 @@ namespace WindowsSudo.Action.Actions
 
         public Dictionary<string, Type> Arguments => null;
 
-        public Dictionary<string, dynamic> execute(MainService main, TcpClient client,
+        public Dictionary<string, dynamic> execute(MainService main, TCPHandler client,
             Dictionary<string, dynamic> input)
         {
             return Utils.success(new Dictionary<string, dynamic>
