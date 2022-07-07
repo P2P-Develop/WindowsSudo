@@ -38,7 +38,7 @@ namespace WindowsSudo
             processManager = new ProcessManager(this);
             rateLimiter = new RateLimiter(new RateLimiter.RateLimitConfig()); // TODO: load config
             
-            rateLimiter.ready();
+            rateLimiter.Ready();
             TokenManager.Ready();
 
             registerActions();

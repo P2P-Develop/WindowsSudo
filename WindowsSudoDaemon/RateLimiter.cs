@@ -21,15 +21,15 @@ namespace WindowsSudo
             throttles = new Dictionary<TCPHandler, int>();
             
             Timer timer = new Timer(1000);
-            timer.Elapsed += onSecond;
+            timer.Elapsed += OnSecond;
         }
 
-        public void ready()
+        public void Ready()
         {
             _timer.Start();
         }
         
-        public bool onAttemptLogin(TCPHandler tcpHandler)
+        public bool OnAttemptLogin(TCPHandler tcpHandler)
         {
             var attempt = attempts.ContainsKey(tcpHandler) ? attempts[tcpHandler] : 0;
             attempts[tcpHandler] = attempt;
@@ -39,11 +39,11 @@ namespace WindowsSudo
 
             RateLimitConfig.SuppressAction suppressAction = rateLimitConfig.SuppressActions[attempt];
             
-            doPunish(tcpHandler, suppressAction);
+            DoPunish(tcpHandler, suppressAction);
             return false;
         }
         
-        private void doPunish(TCPHandler tcpHandler, RateLimitConfig.SuppressAction suppressAction)
+        private void DoPunish(TCPHandler tcpHandler, RateLimitConfig.SuppressAction suppressAction)
         {
             switch (suppressAction)
             {
@@ -51,13 +51,13 @@ namespace WindowsSudo
                     tcpHandler.Send(Utils.failure(429, "You have made too many attempts to login. You have been warned."));
                     break;
                 case RateLimitConfig.SuppressAction.WAIT_FIVE_SECONDS:
-                    setThrottle(tcpHandler, 5);
+                    SetThrottle(tcpHandler, 5);
                     break;
                 case RateLimitConfig.SuppressAction.WAIT_THIRTY_SECONDS:
-                    setThrottle(tcpHandler, 30);
+                    SetThrottle(tcpHandler, 30);
                     break;
                 case RateLimitConfig.SuppressAction.WAIT_THREE_MINUTES:
-                    setThrottle(tcpHandler, 3 * 60);
+                    SetThrottle(tcpHandler, 3 * 60);
                     break;
                 case RateLimitConfig.SuppressAction.KICK:
                     tcpHandler.Send(Utils.failure(429, "You have made too many attempts to login. You have been kicked."));
@@ -73,7 +73,7 @@ namespace WindowsSudo
             }
         }
 
-        private void setThrottle(TCPHandler tcpHandler, int throttle)
+        private void SetThrottle(TCPHandler tcpHandler, int throttle)
         {
             throttles[tcpHandler] = throttle;
             
@@ -85,7 +85,7 @@ namespace WindowsSudo
             });
         }
         
-        private void onSecond(object sender, EventArgs e)
+        private void OnSecond(object sender, EventArgs e)
         {
             List<TCPHandler> keys = new List<TCPHandler>(attempts.Keys); // TODO: Verbose processing
 
