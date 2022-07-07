@@ -108,16 +108,15 @@ namespace WindowsSudo
             Dictionary<string, dynamic> request =
                 JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(requestString);
 
-            List<string> missingKeys;
 
-            if ((missingKeys = Utils.checkArgs(new Dictionary<string, Type>
+            if (Utils.checkArgs(new Dictionary<string, Type>
             {
                 { "action", typeof(string) }
-            }, request)).Count > 0)
+            }, request).Count > 0)
             {
                 Debug.WriteLine("[Server] </~ [{0}] Request handle failed: Parameter 'action' not found.", client.Client.RemoteEndPoint);
                 response["success"] = false;
-                response["message"] = "Invalid or missing arguments: " + string.Join(", ", missingKeys);
+                response["message"] = "Invalid or missing arguments: action";
                 return response;
             }
             
