@@ -1,4 +1,6 @@
-﻿namespace WindowsSudo
+﻿using System.Diagnostics;
+
+namespace WindowsSudo
 {
     internal static class Program
     {
@@ -7,8 +9,9 @@
         /// </summary>
         private static void Main()
         {
+            Debug.WriteLine("Entrypoint has called.");
 #if DEBUG
-            Debug();
+            RunDebug();
 #else
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
@@ -19,8 +22,10 @@
 #endif
         }
 
-        private static void Debug()
+        private static void RunDebug()
         {
+            Debug.WriteLine("Debug mode is enabled.");
+            Debug.WriteLine("Launch...");
             MainService service = new MainService();
             service.TestStartupAndStop(new string[] { });
         }

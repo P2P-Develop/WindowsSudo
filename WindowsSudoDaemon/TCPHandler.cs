@@ -64,6 +64,7 @@ namespace WindowsSudo
                     }
                     catch(JsonReaderException e)
                     {
+                        Debug.WriteLine("[Server] </~ [{0}] Request handle failed: Failed to parse json.", client.Client.RemoteEndPoint);
                         Send(JsonConvert.SerializeObject(new Dictionary<string, dynamic>
                         {
                             {"success", false},
@@ -114,12 +115,13 @@ namespace WindowsSudo
                 { "action", typeof(string) }
             }, request)).Count > 0)
             {
+                Debug.WriteLine("[Server] </~ [{0}] Request handle failed: Parameter 'action' not found.", client.Client.RemoteEndPoint);
                 response["success"] = false;
                 response["message"] = "Invalid or missing arguments: " + string.Join(", ", missingKeys);
                 return response;
             }
-
-            Debug.WriteLine("Received request: \n" + request);
+            
+            Debug.WriteLine("[Server] <~~ [{0}] Received Request", client.Client.RemoteEndPoint);
 
             try
             {
@@ -127,7 +129,7 @@ namespace WindowsSudo
             }
             catch (ArgumentException e)
             {
-                Debug.WriteLine("Missing arguments: " + e.Message);
+                Debug.WriteLine("[Server] </~ [{0}] Missing argument: {1}", client.Client.RemoteEndPoint, e.Message);
                 response["success"] = false;
                 response["code"] = 400;
                 response["message"] = "Invalid or missing arguments";
@@ -135,7 +137,7 @@ namespace WindowsSudo
             }
             catch (ActionNotFoundException)
             {
-                Debug.WriteLine("Action not found: " + request["action"]);
+                Debug.WriteLine("[Server] </~ [{0}] Action not found: {1}", client.Client.RemoteEndPoint, request["action"]);
                 response["success"] = false;
                 response["code"] = 404;
                 response["message"] = "Action not found";
@@ -143,7 +145,7 @@ namespace WindowsSudo
             }
             catch (Exception e)
             {
-                Debug.WriteLine("An exception has occurred: ");
+                Debug.WriteLine("[Server] </~ [{0}] An exception has occurred: ", client.Client.RemoteEndPoint);
                 Debug.WriteLine(e);
                 response["success"] = false;
                 response["code"] = 500;

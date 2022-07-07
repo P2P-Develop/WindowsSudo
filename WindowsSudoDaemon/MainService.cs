@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.ServiceProcess;
 using System.Threading;
@@ -22,10 +23,13 @@ namespace WindowsSudo
 
         public MainService()
         {
+            Debug.WriteLine("MainService constructor called.");
             InitializeComponent();
-
+            
             basePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "WindowsSudo");
             config = new FileConfiguration(Path.Combine(basePath, "config.json"));
+            
+            Debug.WriteLine("Saving default config...");
             saveDefaultConfig(config);
             
             actions = new ActionExecutor(this);

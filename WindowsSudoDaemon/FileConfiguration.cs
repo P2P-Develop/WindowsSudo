@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using Newtonsoft.Json;
 
@@ -18,9 +19,14 @@ namespace WindowsSudo
         {
             _filePath = filePath;
             configuration = new Dictionary<string, dynamic>();
-            
+
             if (File.Exists(filePath))
-                LoadConfig();
+            {
+                if (LoadConfig())
+                    Debug.WriteLine("[AutoLoadConfig] Loaded from file " + filePath);
+                else
+                    Debug.WriteLine("[AutoLoadConfig] Failed to load from file " + filePath);
+            }
         }
 
         public void SaveDefaultConfig(Dictionary<string, dynamic> defaultConfiguration)
@@ -42,15 +48,23 @@ namespace WindowsSudo
             configuration = defaultConfiguration;
         }
         
-        public void LoadConfig()
+        public bool LoadConfig()
         {
+            Debug.WriteLine("Loading configuration from " + _filePath);
+            
+            if (!File.Exists(_filePath))
+                return false;
+            
             var json = File.ReadAllText(_filePath);
             var config = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(json);
             configuration = config;
+
+            return true;
         }
 
         public void SaveConfig()
         {
+            Debug.WriteLine("Saving configuration to " + _filePath);
             var json = JsonConvert.SerializeObject(configuration);
             File.WriteAllText(_filePath, json);
         }

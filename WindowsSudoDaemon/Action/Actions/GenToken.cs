@@ -48,7 +48,7 @@ namespace WindowsSudo.Action.Actions
                 return Utils.failure(403, "Bad credential.");
             }
             
-            Debug.WriteLine("Generating token...");
+            Debug.Write("Generating token...");
             TokenManager.TokenInfo token = TokenManager.GenerateToken(username, password, domain);
             Debug.WriteLine("DONE");
 
@@ -70,7 +70,7 @@ namespace WindowsSudo.Action.Actions
                 CredentialHelper.ValidateAccount(username, password, domain, true);
                 // Usually, ValidateAccount() returns boolean, but it always returns true because if validation fails, they throw an exception.
                 Debug.WriteLine("DONE");
-                Debug.WriteLine("Congratulations, they has been passed all tests!");
+                Debug.WriteLine("Congratulations, they has passed all tests!");
                 return true;
             }
             catch (CredentialHelper.Exceptions.BadPasswordException)
