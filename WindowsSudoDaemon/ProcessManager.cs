@@ -57,8 +57,7 @@ namespace WindowsSudo
 
             try
             {
-                return ActuallyStart(path, args, newWindow, workingDir, env, tokenInfo.Username,
-                    tokenInfo.Password.ToString(), tokenInfo.Domain);
+                return ActuallyStart(path, args, newWindow, workingDir, env, tokenInfo);
             }
             catch (Exception e)
             {
@@ -69,7 +68,7 @@ namespace WindowsSudo
 
         private ProcessInfo ActuallyStart(string path, string[] args, bool window,
             string workingDir, Dictionary<string, string> env,
-            string username, string password, string domain)
+            TokenManager.TokenInfo tokenInfo)
         {
             ProcessStartInfo startInfo = new ProcessStartInfo(path);
 
@@ -83,6 +82,10 @@ namespace WindowsSudo
 
             foreach (KeyValuePair<string, string> kv in env)
                 startInfo.EnvironmentVariables[kv.Key] = kv.Value;
+
+            var username = tokenInfo.Username;
+            var password = tokenInfo.Password.ToString();
+            var domain = tokenInfo.Domain;
 
             if (username != null)
             {
@@ -99,7 +102,7 @@ namespace WindowsSudo
 
             process.Start();
 
-            ProcessInfo info = new ProcessInfo(process.Id, path, workingDir, args, env);
+            ProcessInfo info = new ProcessInfo(process.Id, path, workingDir, args, env, tokenInfo.Token);
 
             processes.Add(process.Id, info);
 
@@ -121,13 +124,14 @@ namespace WindowsSudo
         public class ProcessInfo
         {
             public ProcessInfo(int id, string fullPath, string workingDir, string[] args,
-                Dictionary<string, string> env)
+                Dictionary<string, string> env, string token)
             {
                 Id = id;
                 FullPath = fullPath;
                 WorkingDir = workingDir;
                 Args = args;
                 Env = env;
+                Token = token;
             }
 
             public int Id { get; set; }
@@ -139,6 +143,8 @@ namespace WindowsSudo
             public string[] Args { get; set; }
 
             public Dictionary<string, string> Env { get; set; }
+
+            public string Token { get; set; }
         }
     }
 }
