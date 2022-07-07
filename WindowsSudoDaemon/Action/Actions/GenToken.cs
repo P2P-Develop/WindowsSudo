@@ -19,12 +19,13 @@ namespace WindowsSudo.Action.Actions
             Dictionary<string, dynamic> input)
         {
             SelectQuery query = new SelectQuery("Win32_UserAccount");
+#if DEBUG
             ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
 
             Debug.WriteLine("[GenerateToken] Enumerating users...");
             foreach (ManagementObject envVar in searcher.Get())
                 Debug.WriteLine("[GenerateToken] Username : {0}", envVar["Name"]);
-
+#endif
             string username = input["username"];
             string domain, password;
             if (input.ContainsKey("domain"))
