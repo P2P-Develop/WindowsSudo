@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Timers;
 
 namespace WindowsSudo
 {
@@ -9,14 +11,24 @@ namespace WindowsSudo
         private RateLimitConfig rateLimitConfig { get; }
         private Dictionary<TCPHandler, int> attempts { get; }
         private Dictionary<TCPHandler, int> throttles { get; }
+        
+        private readonly Timer _timer;
 
         public RateLimiter(RateLimitConfig rateLimitConfig)
         {
             this.rateLimitConfig = rateLimitConfig;
             attempts = new Dictionary<TCPHandler, int>();
             throttles = new Dictionary<TCPHandler, int>();
+            
+            Timer timer = new Timer(1000);
+            timer.Elapsed += onSecond;
         }
 
+        public void ready()
+        {
+            _timer.Start();
+        }
+        
         public bool onAttemptLogin(TCPHandler tcpHandler)
         {
             var attempt = attempts.ContainsKey(tcpHandler) ? attempts[tcpHandler] : 0;
@@ -73,7 +85,7 @@ namespace WindowsSudo
             });
         }
         
-        private void onSecond()
+        private void onSecond(object sender, EventArgs e)
         {
             List<TCPHandler> keys = new List<TCPHandler>(attempts.Keys); // TODO: Verbose processing
 
