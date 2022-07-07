@@ -65,7 +65,7 @@ namespace WindowsSudo
                     var duration = tokenInfo.Duration -= 1;
                     if (duration <= 0)
                     {
-                        _tokens.Remove(tokenInfo.Username);
+                        _tokens.Remove(tokenInfo.Token);
                         Debug.WriteLine("Token expired: " + tokenInfo.Username);
                     }
                 }
