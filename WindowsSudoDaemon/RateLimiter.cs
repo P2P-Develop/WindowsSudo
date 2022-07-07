@@ -16,6 +16,7 @@ namespace WindowsSudo
 
             Timer timer = new Timer(1000);
             timer.Elapsed += OnSecond;
+            _timer = timer;
         }
 
         private RateLimitConfig rateLimitConfig { get; }
