@@ -12,32 +12,33 @@ namespace WindowsSudo
     public partial class MainService : ServiceBase
     {
         public static MainService Instance;
+        public ActionExecutor actions;
 
         public string basePath;
         public FileConfiguration config;
-        public ActionExecutor actions;
         public ProcessManager processManager;
+        public RateLimiter rateLimiter;
         public TCPServer server;
         public Thread serverThread;
-        public RateLimiter rateLimiter;
 
         public MainService()
         {
             Debug.WriteLine("MainService constructor called.");
             InitializeComponent();
-            
-            basePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "WindowsSudo");
+
+            basePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+                "WindowsSudo");
             config = new FileConfiguration(Path.Combine(basePath, "config.json"));
-            
+
             Debug.WriteLine("Saving default config...");
             saveDefaultConfig(config);
-            
+
             actions = new ActionExecutor(this);
             server = new TCPServer(config.GetString("network.host"), config.GetInteger("network.port"), actions);
             serverThread = new Thread(() => server.Start());
             processManager = new ProcessManager(this);
             rateLimiter = new RateLimiter(new RateLimiter.RateLimitConfig()); // TODO: load config
-            
+
             rateLimiter.Ready();
             TokenManager.Ready();
 
@@ -78,9 +79,10 @@ namespace WindowsSudo
                 {
                     "network", new Dictionary<string, dynamic>
                     {
-                        {"host", "127.0.0.1"},
-                        {"port", 14105}
-                    }}
+                        { "host", "127.0.0.1" },
+                        { "port", 14105 }
+                    }
+                }
             });
         }
     }

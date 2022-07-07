@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
@@ -10,11 +9,11 @@ namespace WindowsSudo
     public class FileConfiguration
     {
         private static readonly char DELIMITER = '.';
+        private readonly string _filePath;
+        private Dictionary<string, dynamic> configuration;
 
         private Dictionary<string, dynamic> defaultConfig;
-        private Dictionary<string, dynamic> configuration;
-        private string _filePath;
-        
+
         public FileConfiguration(string filePath)
         {
             _filePath = filePath;
@@ -37,26 +36,26 @@ namespace WindowsSudo
             var dir = Path.GetDirectoryName(_filePath);
             if (dir != null && !Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
-            
+
             var json = JsonConvert.SerializeObject(defaultConfiguration);
-            
+
             File.WriteAllText(_filePath, json);
-            
+
             if (defaultConfig == null)
                 defaultConfig = defaultConfiguration;
 
             configuration = defaultConfiguration;
         }
-        
+
         public bool LoadConfig()
         {
             Debug.WriteLine("Loading configuration from " + _filePath);
-            
+
             if (!File.Exists(_filePath))
                 return false;
-            
+
             var json = File.ReadAllText(_filePath);
-            var config = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(json);
+            Dictionary<string, dynamic> config = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(json);
             configuration = config;
 
             return true;
@@ -68,37 +67,36 @@ namespace WindowsSudo
             var json = JsonConvert.SerializeObject(configuration);
             File.WriteAllText(_filePath, json);
         }
-        
+
         /// <summary>
-        /// Returns the value of the configuration parameter with the given key.
-        /// Key is separated by dots. Nested key is supported if the non-nested value is a dictionary.
+        ///     Returns the value of the configuration parameter with the given key.
+        ///     Key is separated by dots. Nested key is supported if the non-nested value is a dictionary.
         /// </summary>
         /// <param name="key">Access key</param>
         /// <param name="useDefaultOnNull">Returns default value on null</param>
         /// <param name="source">Set null to use internal config</param>
         /// <returns>Configuration value</returns>
-        public dynamic GetConfig(string key, bool useDefaultOnNull = false, Dictionary<string, dynamic> source=null)
+        public dynamic GetConfig(string key, bool useDefaultOnNull = false, Dictionary<string, dynamic> source = null)
         {
             if (source == null)
                 source = configuration;
 
             if (source.ContainsKey(key))
             {
-                dynamic value = source[key];
+                var value = source[key];
 
                 if (value == null && useDefaultOnNull)
                     return GetConfig(key, false, defaultConfig);
-                else
-                    return value;
+                return value;
             }
 
             var keys = key.Split(DELIMITER);
-           
+
             if (keys.Length == 1)
                 return null;
-            
+
             dynamic current = source;
-            
+
             foreach (var dkey in keys)
             {
                 if (current.GetType() != typeof(Dictionary<string, dynamic>) && !current.ContainsKey(dkey))
@@ -109,42 +107,41 @@ namespace WindowsSudo
 
                 current = current[dkey];
             }
-            
+
             if (current == null && useDefaultOnNull)
                 return GetConfig(key, false, defaultConfig);
-            else
-                return current;
+            return current;
         }
 
         public int GetInteger(string key, bool useDefaultOnNull = true)
         {
-            dynamic value = GetConfig(key, useDefaultOnNull);
-            
+            var value = GetConfig(key, useDefaultOnNull);
+
             if (value == null)
                 throw new NoNullAllowedException("Configuration value is null: " + key);
-            
-            return (int) value;
+
+            return (int)value;
         }
-        
+
         public string GetString(string key, bool useDefaultOnNull = true)
         {
             return GetConfig(key, useDefaultOnNull).ToString();
         }
-        
+
         public bool GetBoolean(string key, bool falseOnNull = false, bool useDefaultOnNull = true)
         {
-            dynamic value = GetConfig(key, useDefaultOnNull);
-            
+            var value = GetConfig(key, useDefaultOnNull);
+
             if (value == null)
                 if (falseOnNull)
                     return false;
                 else
                     throw new NoNullAllowedException("Configuration value is null: " + key);
-            
-            return (bool) value;
+
+            return (bool)value;
         }
-        
-        
+
+
         public bool IsNull(string key)
         {
             return GetConfig(key) == null;
@@ -153,12 +150,12 @@ namespace WindowsSudo
         public void SetConfig(string key, dynamic value)
         {
             var keys = key.Split(DELIMITER);
-           
+
             if (keys.Length == 1)
                 configuration[key] = value;
-            
+
             dynamic current = configuration;
-            
+
             for (var keyIndex = 0; keyIndex < keys.Length - 1; keyIndex++)
             {
                 var dkey = keys[keyIndex];

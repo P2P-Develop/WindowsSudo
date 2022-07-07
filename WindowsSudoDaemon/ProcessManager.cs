@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
-using System.Security;
-using System.Security.Authentication;
 
 namespace WindowsSudo
 {
@@ -60,7 +58,8 @@ namespace WindowsSudo
                     if (CredentialHelper.DomainExists(domain))
                     {
                         Debug.WriteLine("Could not find domain " + domain);
-                        throw new CredentialHelper.Exceptions.DomainNotFoundException("Could not find domain " + domain);
+                        throw new CredentialHelper.Exceptions.DomainNotFoundException("Could not find domain " +
+                            domain);
                     }
 
                 if (!CredentialHelper.UserExists(username))

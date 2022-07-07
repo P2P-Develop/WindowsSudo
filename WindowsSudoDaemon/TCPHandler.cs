@@ -62,21 +62,21 @@ namespace WindowsSudo
                             Send(response);
                         }
                     }
-                    catch(JsonReaderException e)
+                    catch (JsonReaderException e)
                     {
-                        Debug.WriteLine("[Server] </~ [{0}] Request handle failed: Failed to parse json.", client.Client.RemoteEndPoint);
+                        Debug.WriteLine("[Server] </~ [{0}] Request handle failed: Failed to parse json.",
+                            client.Client.RemoteEndPoint);
                         Send(JsonConvert.SerializeObject(new Dictionary<string, dynamic>
                         {
-                            {"success", false},
-                            {"code", 400},
-                            {"message", "Failed to parse request."},
+                            { "success", false },
+                            { "code", 400 },
+                            { "message", "Failed to parse request." }
                         }));
                     }
                     finally
                     {
                         received_reqeust.Clear();
                     }
-
                 }
             }
             catch (Exception e)
@@ -85,7 +85,7 @@ namespace WindowsSudo
             }
         }
 
-        
+
         public void Send(byte[] bytes)
         {
             stream.Write(bytes, 0, bytes.Length);
@@ -96,7 +96,7 @@ namespace WindowsSudo
         {
             Send(Encoding.UTF8.GetBytes(str));
         }
-        
+
         public void Send(dynamic response)
         {
             Send(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response)));
@@ -110,16 +110,17 @@ namespace WindowsSudo
 
 
             if (Utils.checkArgs(new Dictionary<string, Type>
+                {
+                    { "action", typeof(string) }
+                }, request).Count > 0)
             {
-                { "action", typeof(string) }
-            }, request).Count > 0)
-            {
-                Debug.WriteLine("[Server] </~ [{0}] Request handle failed: Parameter 'action' not found.", client.Client.RemoteEndPoint);
+                Debug.WriteLine("[Server] </~ [{0}] Request handle failed: Parameter 'action' not found.",
+                    client.Client.RemoteEndPoint);
                 response["success"] = false;
                 response["message"] = "Invalid or missing arguments: action";
                 return response;
             }
-            
+
             Debug.WriteLine("[Server] <~~ [{0}] Received Request", client.Client.RemoteEndPoint);
 
             try
@@ -136,7 +137,8 @@ namespace WindowsSudo
             }
             catch (ActionNotFoundException)
             {
-                Debug.WriteLine("[Server] </~ [{0}] Action not found: {1}", client.Client.RemoteEndPoint, request["action"]);
+                Debug.WriteLine("[Server] </~ [{0}] Action not found: {1}", client.Client.RemoteEndPoint,
+                    request["action"]);
                 response["success"] = false;
                 response["code"] = 404;
                 response["message"] = "Action not found";

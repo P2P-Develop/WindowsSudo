@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Management;
 using System.Net.Sockets;
 
@@ -19,15 +18,12 @@ namespace WindowsSudo.Action.Actions
         public Dictionary<string, dynamic> execute(MainService main, TcpClient client,
             Dictionary<string, dynamic> input)
         {
-
             SelectQuery query = new SelectQuery("Win32_UserAccount");
             ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
-            
+
             Debug.WriteLine("[GenerateToken] Enumerating users...");
             foreach (ManagementObject envVar in searcher.Get())
-            {
                 Debug.WriteLine("[GenerateToken] Username : {0}", envVar["Name"]);
-            }
 
             string username = input["username"];
             string domain, password;
@@ -42,12 +38,9 @@ namespace WindowsSudo.Action.Actions
 
             if (username == null)
                 return Utils.failure(400, "Required credentials.");
-            
-            if (!CheckCredential(domain, username, password))
-            {
-                return Utils.failure(403, "Bad credential.");
-            }
-            
+
+            if (!CheckCredential(domain, username, password)) return Utils.failure(403, "Bad credential.");
+
             Debug.Write("[GenerateToken] Generating token...");
             TokenManager.TokenInfo token = TokenManager.GenerateToken(username, password, domain);
             Debug.WriteLine("DONE");
@@ -58,13 +51,12 @@ namespace WindowsSudo.Action.Actions
                 { "token_private", token.Token_Priv },
                 { "expires_in", DateTime.Now.Second + token.Duration }
             });
-
         }
-        
+
         private bool CheckCredential(string domain, string username, string password)
         {
             Debug.WriteLine("[GenerateToken] Checking provided credential is valid...");
-            
+
             try
             {
                 CredentialHelper.ValidateAccount(username, password, domain, true);
@@ -74,7 +66,8 @@ namespace WindowsSudo.Action.Actions
             }
             catch (CredentialHelper.Exceptions.BadPasswordException)
             {
-                Debug.WriteLine("[GenerateToken] Domain exists(or not specified), user exists, but password is wrong. hmm...");
+                Debug.WriteLine(
+                    "[GenerateToken] Domain exists(or not specified), user exists, but password is wrong. hmm...");
                 return false;
             }
             catch (CredentialHelper.Exceptions.DomainNotFoundException)

@@ -52,7 +52,8 @@ namespace WindowsSudo
         }
 
         [DllImport("advapi32.dll")]
-        public static extern bool LogonUser(string userName, string domainName, string password, int LogonType, int LogonProvider,ref IntPtr phToken);
+        public static extern bool LogonUser(string userName, string domainName, string password, int LogonType,
+            int LogonProvider, ref IntPtr phToken);
 
 
         public static bool ValidateAccount(string name, string password)
@@ -67,14 +68,14 @@ namespace WindowsSudo
             return LogonUser(name, Dns.GetHostName(), password, 2, 0, ref tokenHandler);
         }
 
-        public static bool ValidateAccount(string name, string password, string domain, bool exception=false)
+        public static bool ValidateAccount(string name, string password, string domain, bool exception = false)
         {
             if (domain != null && !ACAvailable())
                 if (exception)
                     throw new Exception("Domain name specified but Active Directory is not available in this machine.");
                 else
                     return false;
-            
+
             if (domain != null && !DomainExists(domain))
                 if (exception)
                     throw new Exceptions.DomainNotFoundException("Could not find domain " + domain);
@@ -87,7 +88,7 @@ namespace WindowsSudo
                 else
                     return false;
 
-            
+
             if (password == null)
             {
                 if (UserPasswordRequired(name, domain))
@@ -98,7 +99,7 @@ namespace WindowsSudo
 
                 return true;
             }
-            
+
             if (domain == null)
                 return ValidateAccount(name, password);
 
@@ -128,8 +129,7 @@ namespace WindowsSudo
 
                     if (user == null)
                         return true;
-                    else
-                        user.ChangePassword("", "");
+                    user.ChangePassword("", "");
                     return false;
                 }
             }
@@ -164,46 +164,90 @@ namespace WindowsSudo
 
         public static class Exceptions
         {
-            [Serializable()]
+            [Serializable]
             public class UserNotFoundException : Exception
             {
-                public UserNotFoundException(string message) : base(message) { }
-                public UserNotFoundException(string message, Exception innerException) : base(message, innerException) { }
-                protected UserNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+                public UserNotFoundException(string message) : base(message)
+                {
+                }
+
+                public UserNotFoundException(string message, Exception innerException) : base(message, innerException)
+                {
+                }
+
+                protected UserNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context)
+                {
+                }
             }
 
-            [Serializable()]
+            [Serializable]
             public class BadPasswordException : Exception
             {
-                public BadPasswordException(string message) : base(message) { }
-                public BadPasswordException(string message, Exception innerException) : base(message, innerException) { }
-                protected BadPasswordException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+                public BadPasswordException(string message) : base(message)
+                {
+                }
+
+                public BadPasswordException(string message, Exception innerException) : base(message, innerException)
+                {
+                }
+
+                protected BadPasswordException(SerializationInfo info, StreamingContext context) : base(info, context)
+                {
+                }
             }
 
-            [Serializable()]
+            [Serializable]
             public class PasswordRequiredException : Exception
             {
-                public PasswordRequiredException(string message) : base(message) { }
-                public PasswordRequiredException(string message, Exception innerException) : base(message, innerException) { }
-                protected PasswordRequiredException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+                public PasswordRequiredException(string message) : base(message)
+                {
+                }
+
+                public PasswordRequiredException(string message, Exception innerException) : base(message,
+                    innerException)
+                {
+                }
+
+                protected PasswordRequiredException(SerializationInfo info, StreamingContext context) : base(info,
+                    context)
+                {
+                }
             }
 
 
-
-            [Serializable()]
+            [Serializable]
             public class DomainNotFoundException : Exception
             {
-                public DomainNotFoundException(string message) : base(message) { }
-                public DomainNotFoundException(string message, Exception innerException) : base(message, innerException) { }
-                protected DomainNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+                public DomainNotFoundException(string message) : base(message)
+                {
+                }
+
+                public DomainNotFoundException(string message, Exception innerException) : base(message, innerException)
+                {
+                }
+
+                protected DomainNotFoundException(SerializationInfo info, StreamingContext context) : base(info,
+                    context)
+                {
+                }
             }
-            
-            [Serializable()]
+
+            [Serializable]
             public class ActiveDirectoryNotAvailable : Exception
             {
-                public ActiveDirectoryNotAvailable(string message) : base(message) { }
-                public ActiveDirectoryNotAvailable(string message, Exception innerException) : base(message, innerException) { }
-                protected ActiveDirectoryNotAvailable(SerializationInfo info, StreamingContext context) : base(info, context) { }
+                public ActiveDirectoryNotAvailable(string message) : base(message)
+                {
+                }
+
+                public ActiveDirectoryNotAvailable(string message, Exception innerException) : base(message,
+                    innerException)
+                {
+                }
+
+                protected ActiveDirectoryNotAvailable(SerializationInfo info, StreamingContext context) : base(info,
+                    context)
+                {
+                }
             }
         }
     }

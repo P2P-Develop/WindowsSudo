@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Security;
 using System.Security.Cryptography;
@@ -14,10 +13,10 @@ namespace WindowsSudo
     {
         private static TokenManager _instance;
         private readonly object _lock = new object();
+        private readonly SHA256CryptoServiceProvider _sha256;
+        private readonly Timer _timer;
 
         private readonly Dictionary<string, TokenInfo> _tokens;
-        private readonly Timer _timer;
-        private readonly SHA256CryptoServiceProvider _sha256;
 
 
         private TokenManager()
@@ -31,15 +30,10 @@ namespace WindowsSudo
         public static void Ready()
         {
             if (_instance == null)
-            {
                 lock (typeof(TokenManager))
                 {
-                    if (_instance == null)
-                    {
-                        _instance = new TokenManager();
-                    }
+                    if (_instance == null) _instance = new TokenManager();
                 }
-            }
 
             lock (_instance._lock)
             {
@@ -53,7 +47,7 @@ namespace WindowsSudo
 
             TokenInfo token = new TokenInfo(username, password, domain);
 
-            lock(_instance._lock)
+            lock (_instance._lock)
             {
                 _instance._tokens.Add(token.Token, token);
             }
@@ -62,14 +56,13 @@ namespace WindowsSudo
         }
 
 
-
         private void OnTimer(object sender, EventArgs e)
         {
             lock (_instance._lock)
             {
                 foreach (TokenInfo tokenInfo in _tokens.Values)
                 {
-                    int duration = tokenInfo.Duration -= 1;
+                    var duration = tokenInfo.Duration -= 1;
                     if (duration <= 0)
                     {
                         _tokens.Remove(tokenInfo.Username);
@@ -81,15 +74,15 @@ namespace WindowsSudo
 
         public static bool ValidateToken(string token, string token_priv)
         {
-            lock(_instance._lock)
+            lock (_instance._lock)
             {
                 if (_instance._tokens.ContainsKey(token))
                 {
                     TokenInfo tokenInfo = _instance._tokens[token];
                     return tokenInfo.Token == token && tokenInfo.Token_Priv == token_priv;
                 }
-                else
-                    return false;
+
+                return false;
             }
         }
 
@@ -102,20 +95,13 @@ namespace WindowsSudo
                     TokenInfo tokenInfo = _instance._tokens[token];
                     return tokenInfo;
                 }
-                else
-                    return null;
+
+                return null;
             }
         }
 
         public class TokenInfo
         {
-            public string Username { get; }
-            public SecureString Password { get; }
-            public string Domain { get; }
-            public int Duration { get; set; }
-            public string Token { get; }
-            public string Token_Priv { get; }
-
             public TokenInfo(string username, string password, string domain)
             {
                 Username = username;
@@ -126,6 +112,13 @@ namespace WindowsSudo
                 Token_Priv = Convert.ToBase64String(_instance._sha256.ComputeHash(
                     Encoding.UTF8.GetBytes(username + domain + DateTime.Now)));
             }
+
+            public string Username { get; }
+            public SecureString Password { get; }
+            public string Domain { get; }
+            public int Duration { get; set; }
+            public string Token { get; }
+            public string Token_Priv { get; }
         }
     }
 }

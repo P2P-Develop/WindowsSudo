@@ -49,8 +49,8 @@ namespace WindowsSudo
 
         public static string escapeArgsAsString(string[] args)
         {
-            string result = "";
-            foreach(string arg in args)
+            var result = "";
+            foreach (var arg in args)
             {
                 if (result.Length != 0)
                     result += " ";
