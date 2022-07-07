@@ -55,6 +55,13 @@ namespace WindowsSudo
             return token;
         }
 
+        public static void InvalidateToken(string token)
+        {
+            lock (_instance._lock)
+            {
+                _instance._tokens.Remove(token);
+            }
+        }
 
         private void OnTimer(object sender, EventArgs e)
         {

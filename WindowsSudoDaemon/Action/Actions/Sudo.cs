@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Sockets;
+using System.Security.Authentication;
 
 namespace WindowsSudo.Action.Actions
 {
@@ -12,6 +12,8 @@ namespace WindowsSudo.Action.Actions
 
         public Dictionary<string, Type> Arguments => new Dictionary<string, Type>
         {
+            { "token", typeof(string) },
+            { "token_private", typeof(string) },
             { "command", typeof(string) },
             { "args", typeof(string[]) },
             { "new_window", typeof(bool) },
@@ -19,52 +21,39 @@ namespace WindowsSudo.Action.Actions
             { "env", typeof(Dictionary<string, string>) }
         };
 
-        public Dictionary<string, dynamic> execute(MainService main, TcpClient client,
+        public Dictionary<string, dynamic> execute(MainService main, TCPHandler client,
             Dictionary<string, dynamic> input)
         {
+            string token = input["token"];
+            string token_private = input["token_private"];
+            if (!TokenManager.ValidateToken(token, token_private))
+            {
+                MainService.Instance.rateLimiter.OnAttemptLogin(client);
+                return Utils.failure(403, "Bad credential.");
+            }
+
             string workdir = input["workdir"];
             string command = input["command"];
             string[] args = p(input["args"]);
             bool new_window = input["new_window"];
             Dictionary<string, string> env = p(input["env"]);
 
-            string password, username, domain;
-
-            if (input.ContainsKey("username"))
-            {
-                username = input["username"];
-                domain = input.ContainsKey("domain") ? input["domain"] : null;
-                password = input.ContainsKey("password") ? input["password"] : null;
-            }
-            else
-            {
-                username = null;
-                domain = null;
-                password = null;
-            }
+            TokenManager.TokenInfo tokenInfo = TokenManager.GetTokenInfo(token);
 
             try
             {
                 ProcessManager.ProcessInfo process =
-                    main.processManager.StartProcess(workdir, command, args, new_window, env,
-                        username, password, domain);
+                    main.processManager.StartProcess(workdir, command, args, new_window, env, tokenInfo);
                 return Utils.success("Process created", new Dictionary<string, object>
                 {
                     { "pid", process.Id },
                     { "path", process.FullPath }
                 });
             }
-            catch (CredentialHelper.Exceptions.UserNotFoundException)
+            catch (InvalidCredentialException)
             {
-                return Utils.failure(400, "User not found");
-            }
-            catch (CredentialHelper.Exceptions.BadPasswordException)
-            {
-                return Utils.failure(400, "Bad password");
-            }
-            catch (CredentialHelper.Exceptions.DomainNotFoundException)
-            {
-                return Utils.failure(400, "Domain not found");
+                TokenManager.InvalidateToken(token);
+                return Utils.failure(403, "Bad credential.");
             }
             catch (FileNotFoundException)
             {

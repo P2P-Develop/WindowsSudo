@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Security.Authentication;
 
 namespace WindowsSudo
 {
@@ -31,9 +32,7 @@ namespace WindowsSudo
             string[] args,
             bool newWindow,
             Dictionary<string, string> env,
-            string username,
-            string password,
-            string domain)
+            TokenManager.TokenInfo tokenInfo)
         {
             var path = Utils.ResolvePath(name, workingDir, Environment.GetEnvironmentVariable("PATH"),
                 Environment.GetEnvironmentVariable("PATHEXT"));
@@ -50,41 +49,16 @@ namespace WindowsSudo
                 throw new TypeAccessException(name + " is a directory.");
             }
 
-
-            // Check credential
-            if (username != null)
+            if (!CredentialHelper.ValidateAccount(tokenInfo.Username, tokenInfo.Password.ToString(), tokenInfo.Domain))
             {
-                if (CredentialHelper.ACAvailable())
-                    if (CredentialHelper.DomainExists(domain))
-                    {
-                        Debug.WriteLine("Could not find domain " + domain);
-                        throw new CredentialHelper.Exceptions.DomainNotFoundException("Could not find domain " +
-                            domain);
-                    }
-
-                if (!CredentialHelper.UserExists(username))
-                {
-                    Debug.WriteLine("Could not find user " + username);
-                    throw new CredentialHelper.Exceptions.UserNotFoundException("Could not find user " + username);
-                }
-
-                if (password == null)
-                {
-                    // TODO: Password caching
-                    Debug.WriteLine("Password is null");
-                    throw new CredentialHelper.Exceptions.BadPasswordException("Password is null");
-                }
-
-                if (!CredentialHelper.ValidateAccount(username, password, domain))
-                {
-                    Debug.WriteLine("Could not check credential");
-                    throw new CredentialHelper.Exceptions.BadPasswordException("Could not check credential");
-                }
+                Debug.WriteLine("User account validation failed. It looks like the user account is no longer valid.");
+                throw new InvalidCredentialException();
             }
 
             try
             {
-                return ActuallyStart(path, args, newWindow, workingDir, env, username, password, domain);
+                return ActuallyStart(path, args, newWindow, workingDir, env, tokenInfo.Username,
+                    tokenInfo.Password.ToString(), tokenInfo.Domain);
             }
             catch (Exception e)
             {
