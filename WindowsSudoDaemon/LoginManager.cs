@@ -49,7 +49,6 @@ namespace WindowsSudo
             if (!CheckCredential(domain, username, password))
             {
                 Debug.WriteLine("[Login] Login failed for {0}@{1}", username, domain);
-                rateLimiter.OnAttemptLogin(client);
                 return new CredentialLoginResult(false, null, LoginCause.BAD_CREDENTIAL, rateOnFail);
             }
 
@@ -78,7 +77,6 @@ namespace WindowsSudo
             if (!TokenManager.ValidateToken(token, tokenPrivate))
             {
                 Debug.WriteLine("[Login] Login failed with token.");
-                rateLimiter.OnAttemptLogin(client);
                 return new TokenLoginResult(false, LoginCause.INVALID_TOKEN, rateOnFail);
             }
 

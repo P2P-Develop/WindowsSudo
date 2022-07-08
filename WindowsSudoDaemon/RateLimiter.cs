@@ -34,7 +34,7 @@ namespace WindowsSudo
 
             attempts[tcpHandler] = attempt + 1;
 
-            if (!rateLimitConfig.SuppressActions.ContainsKey(attempt + 1))
+            if (!rateLimitConfig.SuppressActions.ContainsKey(attempt))
                 return true;
 
             RateLimitConfig.SuppressAction suppressAction = rateLimitConfig.SuppressActions[attempt];
@@ -104,16 +104,16 @@ namespace WindowsSudo
 
         private void OnSecond(object sender, EventArgs e)
         {
-            List<TCPHandler> keys = new List<TCPHandler>(attempts.Keys); // TODO: Verbose processing
+            List<TCPHandler> keys = new List<TCPHandler>(throttles.Keys); // TODO: Verbose processing
 
             foreach (TCPHandler tcpHandler in keys)
             {
-                var throttle = attempts[tcpHandler];
+                var throttle = throttles[tcpHandler];
 
                 if (throttle > 0)
-                    attempts[tcpHandler] = throttle - 1;
+                    throttles[tcpHandler] = throttle - 1;
                 else
-                    attempts.Remove(tcpHandler);
+                    throttles.Remove(tcpHandler);
             }
         }
 
