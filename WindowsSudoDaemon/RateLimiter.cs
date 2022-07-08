@@ -65,19 +65,15 @@ namespace WindowsSudo
                     tcpHandler.Send(Utils.failure(429,
                         "You have made too many attempts to login. You have been warned."));
                     break;
-                case RateLimitConfig.SuppressAction.WAIT_FIVE_SECONDS:
-                    SetThrottle(tcpHandler, 5);
-                    break;
-                case RateLimitConfig.SuppressAction.WAIT_THIRTY_SECONDS:
-                    SetThrottle(tcpHandler, 30);
-                    break;
-                case RateLimitConfig.SuppressAction.WAIT_THREE_MINUTES:
-                    SetThrottle(tcpHandler, 3 * 60);
-                    break;
                 case RateLimitConfig.SuppressAction.KICK:
                     tcpHandler.Send(Utils.failure(429,
                         "You have made too many attempts to login. You have been kicked."));
                     tcpHandler.Shutdown();
+                    break;
+                default:
+                    var seconds = (int)suppressAction;
+                    if (seconds > 0)
+                        SetThrottle(tcpHandler, 30);
                     break;
             }
         }
@@ -114,11 +110,12 @@ namespace WindowsSudo
         {
             public enum SuppressAction
             {
-                WARNING,
-                KICK,
-                WAIT_FIVE_SECONDS,
-                WAIT_THIRTY_SECONDS,
-                WAIT_THREE_MINUTES,
+                WARNING = -1,
+                KICK = -2,
+                WAIT_FIVE_SECONDS = 5,
+                WAIT_THIRTY_SECONDS = 30,
+                WAIT_THREE_MINUTES = 3 * 60,
+                WAIT_FIVE_MINUTES = 5 * 60
             }
 
             public RateLimitConfig(Dictionary<int, SuppressAction> suppressActions)
