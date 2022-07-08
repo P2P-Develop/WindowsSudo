@@ -20,8 +20,7 @@ namespace WindowsSudo.Action.Actions
                 return LoginWithToken(main, client, input);
             if (input.ContainsKey("username"))
                 return LoginWithCredentials(main, client, input);
-            else
-                return Utils.failure(400, "Credentials required.");
+            return Utils.failure(400, "Credentials required.");
         }
 
         private Dictionary<string, dynamic> LoginWithToken(MainService main, TCPHandler handler,
@@ -35,10 +34,10 @@ namespace WindowsSudo.Action.Actions
             if (result.Success)
                 return Utils.success();
 
-            if (result.Cause == LoginManager.LoginCause.INVALID_TOKEN) return Utils.failure(400, "Bad credential.");
+            if (result.Cause == LoginManager.LoginCause.INVALID_TOKEN)
+                return Utils.failure(400, "Bad credential.");
 
             if (result.Cause == LoginManager.LoginCause.RATE_LIMIT_EXCEEDED)
-            {
                 return new Dictionary<string, dynamic>
                 {
                     { "success", false },
@@ -46,12 +45,9 @@ namespace WindowsSudo.Action.Actions
                     { "message", "Rate limit exceed." },
                     { "rate", result.CurrentRate }
                 };
-            }
-            else
-            {
-                Debug.WriteLine("[Login] Unknown error: " + result.Cause);
-                return Utils.failure(500, "Unknown error.");
-            }
+
+            Debug.WriteLine("[Login] Unknown error: " + result.Cause);
+            return Utils.failure(500, "Unknown error.");
         }
 
         private Dictionary<string, dynamic> LoginWithCredentials(MainService main, TCPHandler handler,
@@ -81,10 +77,10 @@ namespace WindowsSudo.Action.Actions
                     { "token_private", result.Token.Token_Priv }
                 });
 
-            if (result.Cause == LoginManager.LoginCause.BAD_CREDENTIAL) return Utils.failure(400, "Bad credential.");
+            if (result.Cause == LoginManager.LoginCause.BAD_CREDENTIAL)
+                return Utils.failure(400, "Bad credential.");
 
             if (result.Cause == LoginManager.LoginCause.RATE_LIMIT_EXCEEDED)
-            {
                 return new Dictionary<string, dynamic>
                 {
                     { "success", false },
@@ -92,7 +88,6 @@ namespace WindowsSudo.Action.Actions
                     { "message", "Rate limit exceed." },
                     { "rate", result.CurrentRate }
                 };
-            }
 
             Debug.WriteLine("[Login] Unknown error: " + result.Cause);
             return Utils.failure(500, "Unknown error.");

@@ -32,7 +32,8 @@ namespace WindowsSudo
             if (_instance == null)
                 lock (typeof(TokenManager))
                 {
-                    if (_instance == null) _instance = new TokenManager();
+                    if (_instance == null)
+                        _instance = new TokenManager();
                 }
 
             lock (_instance._lock)
