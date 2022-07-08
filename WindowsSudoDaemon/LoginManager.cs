@@ -53,6 +53,7 @@ namespace WindowsSudo
                 return new CredentialLoginResult(false, null, LoginCause.BAD_CREDENTIAL, rateOnFail);
             }
 
+            Debug.WriteLine("[Login] Congratulations, they has passed all tests!");
             Debug.WriteLine("[Login] Login successful for {0}@{1}", username, domain);
 
             Debug.Write("[Login] Generating token...");
@@ -94,10 +95,7 @@ namespace WindowsSudo
 
             try
             {
-                CredentialHelper.ValidateAccount(username, password, domain, true);
-                // Usually, ValidateAccount() returns boolean, but it always returns true because if validation fails, they throw an exception.
-                Debug.WriteLine("[Login] Congratulations, they has passed all tests!");
-                return true;
+                return CredentialHelper.ValidateAccount(username, password, domain, true);
             }
             catch (CredentialHelper.Exceptions.BadPasswordException)
             {
