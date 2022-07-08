@@ -79,14 +79,6 @@ namespace WindowsSudo
                         "You have made too many attempts to login. You have been kicked."));
                     tcpHandler.Shutdown();
                     break;
-                case RateLimitConfig.SuppressAction.BAN_TEMPORARILY:
-                case RateLimitConfig.SuppressAction.BAN_PERMANENT:
-                    tcpHandler.Send(Utils.failure(429,
-                        "You have made too many attempts to login. You have been temporarily banned."));
-                    tcpHandler.Shutdown();
-
-                    // TODO: implement ban
-                    break;
             }
         }
 
@@ -127,8 +119,6 @@ namespace WindowsSudo
                 WAIT_FIVE_SECONDS,
                 WAIT_THIRTY_SECONDS,
                 WAIT_THREE_MINUTES,
-                BAN_TEMPORARILY,
-                BAN_PERMANENT
             }
 
             public RateLimitConfig(Dictionary<int, SuppressAction> suppressActions)
@@ -146,7 +136,6 @@ namespace WindowsSudo
                 suppresses.Add(7, SuppressAction.WAIT_THIRTY_SECONDS);
                 suppresses.Add(8, SuppressAction.WAIT_THIRTY_SECONDS);
                 suppresses.Add(9, SuppressAction.WAIT_THREE_MINUTES);
-                suppresses.Add(10, SuppressAction.BAN_PERMANENT);
 
                 SuppressActions = suppresses;
             }
