@@ -11,6 +11,9 @@ namespace WindowsSudo.Action.Actions
 
         public Dictionary<string, dynamic> execute(MainService main, TCPHandler client, Dictionary<string, dynamic> _)
         {
+            if (!client.IsLoggedIn())
+                return Utils.failure(401, "Not logged in");
+
             main.Stop();
             return Utils.success();
         }

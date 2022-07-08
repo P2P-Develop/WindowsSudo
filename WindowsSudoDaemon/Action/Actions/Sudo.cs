@@ -23,7 +23,7 @@ namespace WindowsSudo.Action.Actions
             Dictionary<string, dynamic> input)
         {
             if (!client.IsLoggedIn())
-                return Utils.failure(403, "Not logged in.");
+                return Utils.failure(401, "Not logged in");
 
             string workdir = input["workdir"];
             string command = input["command"];
