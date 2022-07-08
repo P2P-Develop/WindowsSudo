@@ -24,7 +24,10 @@ namespace WindowsSudo
             stream = client.GetStream();
             stream.ReadTimeout = 5000;
             alive = true;
+            token = null;
         }
+
+        public TokenManager.TokenInfo token { get; set; }
 
         public void Handle()
         {
@@ -153,6 +156,11 @@ namespace WindowsSudo
                 response["message"] = e.Message;
                 return response;
             }
+        }
+
+        public bool IsLoggedIn()
+        {
+            return token != null && token.IsAlive();
         }
 
         public void Shutdown()

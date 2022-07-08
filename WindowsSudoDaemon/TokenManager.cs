@@ -126,6 +126,11 @@ namespace WindowsSudo
             public int Duration { get; set; }
             public string Token { get; }
             public string Token_Priv { get; }
+
+            public bool IsAlive()
+            {
+                return Duration > 0;
+            }
         }
     }
 }

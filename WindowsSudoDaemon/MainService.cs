@@ -16,8 +16,8 @@ namespace WindowsSudo
 
         public string basePath;
         public FileConfiguration config;
+        public LoginManager loginManager;
         public ProcessManager processManager;
-        public RateLimiter rateLimiter;
         public TCPServer server;
         public Thread serverThread;
 
@@ -37,9 +37,9 @@ namespace WindowsSudo
             server = new TCPServer(config.GetString("network.host"), config.GetInteger("network.port"), actions);
             serverThread = new Thread(() => server.Start());
             processManager = new ProcessManager(this);
-            rateLimiter = new RateLimiter(new RateLimiter.RateLimitConfig()); // TODO: load config
+            loginManager = new LoginManager(new RateLimiter.RateLimitConfig()); // TODO: load config
 
-            rateLimiter.Ready();
+            loginManager.Ready();
             TokenManager.Ready();
 
             registerActions();
@@ -52,7 +52,7 @@ namespace WindowsSudo
             actions.registerAction(new Exit());
             actions.registerAction(new Info());
             actions.registerAction(new Sudo());
-            actions.registerAction(new GenToken());
+            actions.registerAction(new Login());
         }
 
         protected override void OnStart(string[] args)

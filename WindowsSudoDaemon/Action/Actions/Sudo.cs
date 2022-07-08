@@ -12,8 +12,6 @@ namespace WindowsSudo.Action.Actions
 
         public Dictionary<string, Type> Arguments => new Dictionary<string, Type>
         {
-            { "token", typeof(string) },
-            { "token_private", typeof(string) },
             { "command", typeof(string) },
             { "args", typeof(string[]) },
             { "new_window", typeof(bool) },
@@ -24,13 +22,8 @@ namespace WindowsSudo.Action.Actions
         public Dictionary<string, dynamic> execute(MainService main, TCPHandler client,
             Dictionary<string, dynamic> input)
         {
-            string token = input["token"];
-            string token_private = input["token_private"];
-            if (!TokenManager.ValidateToken(token, token_private))
-            {
-                MainService.Instance.rateLimiter.OnAttemptLogin(client);
-                return Utils.failure(403, "Bad credential.");
-            }
+            if (!client.IsLoggedIn())
+                return Utils.failure(403, "Not logged in.");
 
             string workdir = input["workdir"];
             string command = input["command"];
@@ -38,12 +31,10 @@ namespace WindowsSudo.Action.Actions
             bool new_window = input["new_window"];
             Dictionary<string, string> env = p(input["env"]);
 
-            TokenManager.TokenInfo tokenInfo = TokenManager.GetTokenInfo(token);
-
             try
             {
                 ProcessManager.ProcessInfo process =
-                    main.processManager.StartProcess(workdir, command, args, new_window, env, tokenInfo);
+                    main.processManager.StartProcess(workdir, command, args, new_window, env, client.token);
                 return Utils.success("Process created", new Dictionary<string, object>
                 {
                     { "pid", process.Id },
@@ -52,7 +43,7 @@ namespace WindowsSudo.Action.Actions
             }
             catch (InvalidCredentialException)
             {
-                TokenManager.InvalidateToken(token);
+                TokenManager.InvalidateToken(client.token.Token);
                 return Utils.failure(403, "Bad credential.");
             }
             catch (FileNotFoundException)

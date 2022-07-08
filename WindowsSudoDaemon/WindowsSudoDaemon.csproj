@@ -61,7 +61,7 @@
         <Compile Include="Action\ActionExecutor.cs"/>
         <Compile Include="Action\ActionNotFoundException.cs"/>
         <Compile Include="Action\Actions\Exit.cs"/>
-        <Compile Include="Action\Actions\GenToken.cs"/>
+        <Compile Include="Action\Actions\Login.cs"/>
         <Compile Include="Action\Actions\Info.cs"/>
         <Compile Include="Action\Actions\Sudo.cs"/>
         <Compile Include="Action\IActionBase.cs"/>
@@ -83,6 +83,7 @@
         </Compile>
         <Compile Include="Properties\AssemblyInfo.cs"/>
         <Compile Include="RateLimiter.cs"/>
+        <Compile Include="LoginManager.cs"/>
         <Compile Include="TCPHandler.cs"/>
         <Compile Include="TCPServer.cs"/>
         <Compile Include="TokenManager.cs"/>

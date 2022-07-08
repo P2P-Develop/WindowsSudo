@@ -31,15 +31,30 @@ namespace WindowsSudo
         public bool OnAttemptLogin(TCPHandler tcpHandler)
         {
             var attempt = attempts.ContainsKey(tcpHandler) ? attempts[tcpHandler] : 0;
-            attempts[tcpHandler] = attempt;
 
-            if (!rateLimitConfig.SuppressActions.ContainsKey(attempt))
+            attempts[tcpHandler] = attempt + 1;
+
+            if (!rateLimitConfig.SuppressActions.ContainsKey(attempt + 1))
                 return true;
 
             RateLimitConfig.SuppressAction suppressAction = rateLimitConfig.SuppressActions[attempt];
 
             DoPunish(tcpHandler, suppressAction);
             return false;
+        }
+
+        public void OnLoginSucceed(TCPHandler tcpHandler)
+        {
+            attempts.Remove(tcpHandler);
+            throttles.Remove(tcpHandler);
+        }
+
+        public int GetCurrentRate(TCPHandler tcpHandler)
+        {
+            if (!attempts.ContainsKey(tcpHandler))
+                return 0;
+
+            return attempts[tcpHandler];
         }
 
         private void DoPunish(TCPHandler tcpHandler, RateLimitConfig.SuppressAction suppressAction)
@@ -93,12 +108,12 @@ namespace WindowsSudo
 
             foreach (TCPHandler tcpHandler in keys)
             {
-                var throttle = throttles[tcpHandler];
+                var throttle = attempts[tcpHandler];
 
                 if (throttle > 0)
-                    throttles[tcpHandler] = throttle - 1;
+                    attempts[tcpHandler] = throttle - 1;
                 else
-                    throttles.Remove(tcpHandler);
+                    attempts.Remove(tcpHandler);
             }
         }
 
@@ -132,6 +147,8 @@ namespace WindowsSudo
                 suppresses.Add(8, SuppressAction.WAIT_THIRTY_SECONDS);
                 suppresses.Add(9, SuppressAction.WAIT_THREE_MINUTES);
                 suppresses.Add(10, SuppressAction.BAN_PERMANENT);
+
+                SuppressActions = suppresses;
             }
 
             public Dictionary<int, SuppressAction> SuppressActions { get; set; }
