@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // アセンブリに関連付けられている情報を変更するには、
 // これらの属性値を変更してください。
 [assembly: AssemblyTitle("WindowsSudoDaemon")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A client of WindowsSudo")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("WindowsSudoDaemon")]
-[assembly: AssemblyCopyright("Copyright ©  2021")]
+[assembly: AssemblyProduct("WindowsSudo")]
+[assembly: AssemblyCopyright("Copyright © 2022 P2P-Develop., Peyang")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

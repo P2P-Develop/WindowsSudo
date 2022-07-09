@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // 制御されます。アセンブリに関連付けられている情報を変更するには、
 // これらの属性値を変更します。
 [assembly: AssemblyTitle("WindowsSudoClient")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A client of WindowsSudo")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("WindowsSudoClient")]
-[assembly: AssemblyCopyright("Copyright ©  2022")]
+[assembly: AssemblyProduct("WindowsSudo")]
+[assembly: AssemblyCopyright("Copyright © 2022 P2P-Develop., Peyang")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
