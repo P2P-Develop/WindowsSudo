@@ -11,8 +11,8 @@ namespace WindowsSudo
         public RateLimiter(RateLimitConfig rateLimitConfig)
         {
             this.rateLimitConfig = rateLimitConfig;
-            attempts = new Dictionary<TCPHandler, int>();
-            throttles = new Dictionary<TCPHandler, int>();
+            attempts = new Dictionary<int, int>();
+            throttles = new Dictionary<int, int>();
 
             Timer timer = new Timer(1000);
             timer.Elapsed += OnSecond;
@@ -20,8 +20,8 @@ namespace WindowsSudo
         }
 
         private RateLimitConfig rateLimitConfig { get; }
-        private Dictionary<TCPHandler, int> attempts { get; }
-        private Dictionary<TCPHandler, int> throttles { get; }
+        private Dictionary<int, int> attempts { get; }
+        private Dictionary<int, int> throttles { get; }
 
         public void Ready()
         {
@@ -30,9 +30,11 @@ namespace WindowsSudo
 
         public bool OnAttemptLogin(TCPHandler tcpHandler)
         {
-            var attempt = attempts.ContainsKey(tcpHandler) ? attempts[tcpHandler] : 0;
+            var clientIdentifier = tcpHandler.Identify();
 
-            attempts[tcpHandler] = attempt + 1;
+            var attempt = attempts.ContainsKey(clientIdentifier) ? attempts[clientIdentifier] : 0;
+
+            attempts[clientIdentifier] = attempt + 1;
 
             if (!rateLimitConfig.SuppressActions.ContainsKey(attempt))
                 return true;
@@ -45,16 +47,19 @@ namespace WindowsSudo
 
         public void OnLoginSucceed(TCPHandler tcpHandler)
         {
-            attempts.Remove(tcpHandler);
-            throttles.Remove(tcpHandler);
+            var clientIdentifier = tcpHandler.Identify();
+            attempts.Remove(clientIdentifier);
+            throttles.Remove(clientIdentifier);
         }
 
         public int GetCurrentRate(TCPHandler tcpHandler)
         {
-            if (!attempts.ContainsKey(tcpHandler))
+            var clientIdentifier = tcpHandler.Identify();
+
+            if (!attempts.ContainsKey(clientIdentifier))
                 return 0;
 
-            return attempts[tcpHandler];
+            return attempts[clientIdentifier];
         }
 
         private void DoPunish(TCPHandler tcpHandler, RateLimitConfig.SuppressAction suppressAction)
@@ -80,7 +85,7 @@ namespace WindowsSudo
 
         private void SetThrottle(TCPHandler tcpHandler, int throttle)
         {
-            throttles[tcpHandler] = throttle;
+            throttles[tcpHandler.Identify()] = throttle;
 
             tcpHandler.Send(new Dictionary<string, dynamic>
             {
@@ -92,16 +97,16 @@ namespace WindowsSudo
 
         private void OnSecond(object sender, EventArgs e)
         {
-            List<TCPHandler> keys = new List<TCPHandler>(throttles.Keys); // TODO: Verbose processing
+            List<int> keys = new List<int>(throttles.Keys); // TODO: Verbose processing
 
-            foreach (TCPHandler tcpHandler in keys)
+            foreach (var clientIdentify in keys)
             {
-                var throttle = throttles[tcpHandler];
+                var throttle = throttles[clientIdentify];
 
                 if (throttle > 0)
-                    throttles[tcpHandler] = throttle - 1;
+                    throttles[clientIdentify] = throttle - 1;
                 else
-                    throttles.Remove(tcpHandler);
+                    throttles.Remove(clientIdentify);
             }
         }
 

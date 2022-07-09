@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -168,6 +169,11 @@ namespace WindowsSudo
             alive = false;
             Send("{\"exit\": true}");
             client.Close();
+        }
+
+        public int Identify()
+        {
+            return ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString().GetHashCode();
         }
     }
 }
