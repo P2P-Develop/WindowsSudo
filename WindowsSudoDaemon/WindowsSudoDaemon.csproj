@@ -84,6 +84,9 @@
         <Compile Include="Properties\AssemblyInfo.cs"/>
         <Compile Include="RateLimiter.cs"/>
         <Compile Include="LoginManager.cs"/>
+        <Compile Include="Sudoers\Sudoer.cs"/>
+        <Compile Include="Sudoers\Sudoers.cs"/>
+        <Compile Include="Sudoers\SudoersParser.cs"/>
         <Compile Include="TCPHandler.cs"/>
         <Compile Include="TCPServer.cs"/>
         <Compile Include="TokenManager.cs"/>
